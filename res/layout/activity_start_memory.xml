@@ -3,22 +3,42 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <Button
-        android:id="@+id/addPhotoButton"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:id="@+id/ButtonContainer"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/startButton"
-        android:layout_alignRight="@+id/startButton"
-        android:layout_centerVertical="true"
-        android:text="Add Photo" />
-
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="214dp"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/addPhotoButton"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="14dp"
-        android:text="Start" />
+        android:layout_marginBottom="36dp"
+        android:orientation="vertical" >
+
+        <Button
+            android:id="@+id/startButton"
+            android:layout_width="214dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:text="@string/start_game" />
+
+        <Button
+            android:id="@+id/addPhotoButton"
+            android:layout_width="214dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:text="@string/add_photo" />
+
+        <Button
+            android:id="@+id/editButton"
+            android:layout_width="214dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:text="@string/edit_mode" />
+
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="214dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:text="@string/previous_activity" />
+    </LinearLayout>
 
 </RelativeLayout>

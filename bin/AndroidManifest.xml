@@ -7,6 +7,8 @@
         android:minSdkVersion="8"
         android:targetSdkVersion="15" />
 
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
     <application
         android:debuggable="true"
         android:icon="@drawable/ic_launcher"
@@ -22,8 +24,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NextScreen"
-            android:label="@string/title_activity_next_screen" >
+            android:name=".StartMemoryActivity"
+            android:label="@string/title_activity_start_memory" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -31,8 +33,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".StartMemoryActivity"
-            android:label="@string/title_activity_start_memory" >
+            android:name=".ViewerActivity"
+            android:label="@string/title_activity_viewer" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

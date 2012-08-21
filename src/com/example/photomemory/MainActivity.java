@@ -2,24 +2,24 @@ package com.example.photomemory;
 
 import java.io.File;
 import java.util.ArrayList;
-
 import android.os.Bundle;
 import android.os.Environment;
-import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.TableLayout;
-import android.widget.TableRow;
+
 
 
 public class MainActivity extends ListActivity {
-
+	private static final String appName = "PhotoMemory";
 	private static final String TAG = "MainActivity";
+	private static final String newDBString = "+Create First PhotoMem";
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
@@ -27,26 +27,45 @@ public class MainActivity extends ListActivity {
         setContentView(R.layout.activity_main);
         
         ArrayList<String> listItems=new ArrayList<String>();
-        listItems.add("Hello");
-        listItems.add("Kevin");
         
-        Log.v(TAG, "Test");
         File[] folderPaths;
     	folderPaths = findPMFolders();
         if(folderPaths == null)
         {
-
+        	listItems.add(newDBString);
         }
         else
         {
         	for(int i = 0; i < folderPaths.length; i++)
         	{
+        		Log.v(TAG, folderPaths[i].getName());
         		listItems.add(folderPaths[i].getName());
         	}
         }
         
-        ArrayAdapter<String> aa = new ArrayAdapter<String>(this,R.layout.list_item,listItems);
+        final ArrayAdapter<String> aa = new ArrayAdapter<String>(this,R.layout.list_item,listItems);
         setListAdapter(aa);
+        
+        getListView().setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                    int position, long id) {
+            	String selectedFolder = appName + "/" + aa.getItem(position);
+                Log.v(TAG, selectedFolder);
+                if(selectedFolder.equals(newDBString)){
+                	//Go to Creating new PhotoMem
+                	Log.v(TAG, "There are no PhotoMems to select.");
+                }
+                else
+                {
+                	Bundle extras = new Bundle();
+                	extras.putString("dbPath", selectedFolder);
+                	Intent intent = new Intent(MainActivity.this,StartMemoryActivity.class);
+                	intent.putExtras(extras);          
+                	startActivity(intent);
+                }
+            }
+        });
         
   /*      
         final Button button = (Button) findViewById(R.id.button1);
@@ -66,12 +85,17 @@ public class MainActivity extends ListActivity {
     }
     
     public File[] findPMFolders(){
-    	File folder = new File(Environment.getExternalStorageDirectory().getPath() + "/"+R.string.app_name+"/");
-    	Log.v(TAG,folder.getPath());
+    	File folder = new File(Environment.getExternalStorageDirectory().toString() + "/"+appName+"/");
+    	Log.v(TAG,folder.toString());
     	if(!folder.exists()){
-    		folder.mkdir();
+    		folder.mkdirs();
     		Log.v(TAG, "Folder Created");
     	}
+    	else
+    	{
+    		Log.v(TAG, "The folder is already present");
+    	}
+    	
     	return folder.listFiles();
     }
 }
