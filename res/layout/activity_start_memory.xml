@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <Button
+        android:id="@+id/addPhotoButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startButton"
+        android:layout_alignRight="@+id/startButton"
+        android:layout_centerVertical="true"
+        android:text="Add Photo" />
+
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="214dp"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/addPhotoButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="14dp"
+        android:text="Start" />
+
+</RelativeLayout>
