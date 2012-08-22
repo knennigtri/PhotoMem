@@ -2,8 +2,13 @@ package com.example.photomemory;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 
 import android.net.Uri;
+import android.opengl.Visibility;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
@@ -12,8 +17,11 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -24,7 +32,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class ViewerActivity extends Activity {
-
+	private static final String TAG = "ViewerActivity";
+	private int photoIndex = 0;
+	private int correctCount = 0;
+	private int wrongCount = 0;
+	private Bitmap bitmapImage;
+	private ImageView myImageView;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,35 +46,94 @@ public class ViewerActivity extends Activity {
         Bundle bundle = this.getIntent().getExtras();
         final String selectedFolder = bundle.getString("dbPath");
 
-        String memPath = Environment.getExternalStorageDirectory().toString() + "/" + selectedFolder;
+        final String memPath = Environment.getExternalStorageDirectory().toString() + "/" + selectedFolder;
         
+        File folder = new File(memPath);
         
-        //Single file
-        Bitmap bitmap = BitmapFactory.decodeFile(memPath + "/1 - Jeremiah Aleman.jpg");
+        final String[] photoPaths = folder.list(new FilenameFilter(){  
+            @Override  
+            public boolean accept(File dir, String name)  
+            {  
+                return ((name.endsWith(".jpg"))||(name.endsWith(".png")));  
+            }  
+        }); 
+       
+        for(int i = 0; i<photoPaths.length; i++)
+        	Log.v(TAG, i + " - " + photoPaths[i]);
         
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
-        LinearLayout picLayout = (LinearLayout) findViewById(R.id.photoFrame);
- /*       int resizeW = picLayout.getWidth();
-        int resizeH = picLayout.getHeight();
+        nextPhoto(memPath, photoPaths[photoIndex]);
+        photoIndex++;
         
-        Matrix matrix = new Matrix();
-        matrix.setScale(resizeW, resizeH);
-        Bitmap resizedBitmap = Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, false);
-*/
-        
-        ImageView myImageView = (ImageView)findViewById(R.id.imageView);
-        myImageView.setImageBitmap(bitmap);
-        
-        final Button showButton = (Button) findViewById(R.id.showButton);
-        showButton.setOnClickListener(new Button.OnClickListener() {
+        final Button memorizedButton = (Button) findViewById(R.id.memorizedButton);
+        memorizedButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				//TextView name = (TextView) findViewById(R.id.photoName);
-				
+				if(photoIndex < photoPaths.length)
+				{
+					LinearLayout ll = (LinearLayout) findViewById(R.id.controlsFrame);
+	 				ll.setVisibility(4);
+	 				bitmapImage.recycle();
+	 				myImageView.destroyDrawingCache();
+					nextPhoto(memPath, photoPaths[photoIndex]);
+					correctCount++;
+					Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
+					photoIndex++;
+				}
+				else
+				{
+					photoMemoryEnd();
+				}
 			}
         	
         });
+        
+        final Button notMemorizedButton = (Button) findViewById(R.id.notMemorizedButton);
+        notMemorizedButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if(photoIndex < photoPaths.length-1)
+				{
+					LinearLayout ll = (LinearLayout) findViewById(R.id.controlsFrame);
+	 				ll.setVisibility(4);
+	 				bitmapImage.recycle();
+	 				myImageView.destroyDrawingCache();
+					nextPhoto(memPath, photoPaths[photoIndex++]);		
+					wrongCount++;
+					Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
+				}
+				else
+				{
+					photoMemoryEnd();
+				}
+			}
+        	
+        });
+    }
+    
+    private void photoMemoryEnd(){
+    	Log.v(TAG, "Total Photos Iterated: " + photoIndex);
+		Log.v(TAG, "Total correct: " + correctCount);
+		Log.v(TAG, "Total wrong: " + wrongCount);
+		TextView tv = (TextView) findViewById(R.id.photoName);
+		tv.setText("Final Score: Memorized: " + correctCount + " Wrong: " + wrongCount);
+    }
+    
+    private void nextPhoto(String memPath, String name){
+    	final String fullName = name;
+    	bitmapImage = BitmapFactory.decodeFile(memPath + "/" + fullName); 
+         myImageView = (ImageView)findViewById(R.id.imageView);
+         myImageView.setImageBitmap(bitmapImage);
+         myImageView.setOnTouchListener(new OnTouchListener() {
+ 			@Override
+ 			public boolean onTouch(View arg0, MotionEvent arg1) {
+ 				TextView tv = (TextView) findViewById(R.id.photoName);
+ 				tv.setText(fullName.substring(0, fullName.length()-4));
+ 				LinearLayout ll = (LinearLayout) findViewById(R.id.controlsFrame);
+ 				ll.setVisibility(0);
+ 				return false;
+ 			}
+         	
+         });
     }
 
     @Override

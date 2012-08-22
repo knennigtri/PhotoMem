@@ -15,6 +15,7 @@
     <string name="previous_activity">Back</string>
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_viewer">ViewerActivity</string>
-    <string name="show_text">Show</string>
+    <string name="memorized">Memorized!</string>
+    <string name="not_memorized">Wrong</string>
 
 </resources>
