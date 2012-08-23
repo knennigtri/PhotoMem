@@ -1,12 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
-
-   
+    android:layout_height="match_parent"
+    tools:context=".PracticeActivity" >
 
     <LinearLayout
-        android:id="@+id/viewer_photoFrame"
+        android:id="@+id/practice_photoFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
@@ -19,7 +18,7 @@
         >
         
         <ImageView
-		    android:id="@+id/viewer_imageView"
+		    android:id="@+id/practice_imageView"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content" 
 		    />
@@ -27,18 +26,18 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/viewer_controlsFrame"
+        android:id="@+id/practice_controlsFrame"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_marginTop="15dp"
-        android:visibility="invisible"
+        
         android:orientation="vertical" >
         
         <TextView
-        android:id="@+id/viewer_photoName"
+        android:id="@+id/practice_photoName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -50,38 +49,26 @@
    		</TextView>
    		
         <LinearLayout
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="15dp"
-	        android:layout_gravity="center"
-	        android:orientation="horizontal">
-            
-	        <Button
-	        android:id="@+id/viewer_memorizedButton"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center"
-	        android:layout_marginRight="20dp"
-	        android:background="#008000"
-	        android:textColor="#FFFFFF"
-	        android:textStyle="bold"
-	        android:paddingLeft="5dp"
-	        android:paddingRight="5dp"
-	        android:text="@string/viewer_memorized" />
-	        
-	        <Button
-	        android:id="@+id/viewer_notMemorizedButton"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_gravity="center"
-	        android:layout_marginLeft="20dp"
-	        android:background="#FF0000"
-	        android:textColor="#FFFFFF"
-	        android:textStyle="bold"
-	        android:paddingLeft="5dp"
-	        android:paddingRight="5dp"
-	        android:text="@string/viewer_not_memorized" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/practice_nextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_weight="2.50"
+                android:background="#008000"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="@string/practice_nextButton"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold" />
         </LinearLayout>
+
     </LinearLayout>
 
     

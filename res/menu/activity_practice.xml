@@ -2,10 +2,9 @@
     <item android:id="@+id/menu_memory_menu"
         android:title="@string/menu_memory_menu"
         android:orderInCategory="100"
-        android:showAsAction="never"/>
-    <item android:id="@+id/menu_start_over"
-        android:title="@string/menu_start_over"
+        android:showAsAction="never" />
+    <item android:id="@+id/menu_edit"
+        android:title="@string/menu_edit"
         android:orderInCategory="100"
-        android:showAsAction="never"/>
-     
+        android:showAsAction="never" />
 </menu>

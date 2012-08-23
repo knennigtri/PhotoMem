@@ -8,6 +8,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -66,22 +67,6 @@ public class MainActivity extends ListActivity {
                 }
             }
         });
-        
-  /*      
-        final Button button = (Button) findViewById(R.id.button1);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), NextScreen.class);
-                startActivity(intent);
-            }
-        });
-        */
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activity_main, menu);
-        return true;
     }
     
     public File[] findPMFolders(){
@@ -98,4 +83,33 @@ public class MainActivity extends ListActivity {
     	
     	return folder.listFiles();
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.activity_main, menu);
+        return true;
+    }
+    
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+    	switch(item.getItemId()){
+    	case R.id.menu_memory_menu:
+    		startActivity(new Intent(this, StartMemoryActivity.class));
+    		finish();
+    		return true;
+    	case R.id.menu_edit: //TODO Create Preview Edit
+    		//Edit the current file
+    	case R.id.add_mem:
+    		//TODO Create Add Mem Process
+    	case R.id.menu_settings: //TODO Settings page
+    		//startActivity(new Intent(PracticeActivity.this, Settings.class));
+    		finish();
+    		return true;
+    	default:
+    		return super.onOptionsItemSelected(item);
+    	}
+    }
+    
+    
+    
 }

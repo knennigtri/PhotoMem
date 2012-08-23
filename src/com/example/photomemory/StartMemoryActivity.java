@@ -36,7 +36,17 @@ public class StartMemoryActivity extends Activity {
         	}
         });
         
-        
+        final Button practiceButton = (Button) findViewById(R.id.practiceButton);
+        practiceButton.setOnClickListener(new Button.OnClickListener() {
+        	@Override
+        	public void onClick(View arg0){
+        		Bundle extras = new Bundle();
+            	extras.putString("dbPath", selectedFolder);
+            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
+            	intent.putExtras(extras);          
+            	startActivity(intent);
+        	}
+        });
         
         final Button backButton = (Button) findViewById(R.id.backButton);
         backButton.setOnClickListener(new Button.OnClickListener() {
