@@ -17,35 +17,35 @@
             android:layout_width="214dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/start_game" />
+            android:text="@string/startMem_button_start_game" />
 
         <Button
             android:id="@+id/practiceButton"
             android:layout_width="214dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/practice" />
+            android:text="@string/startMem_button_practice" />
         
         <Button
             android:id="@+id/addPhotoButton"
             android:layout_width="214dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/add_photo" />
+            android:text="@string/startMem_button_add_photo" />
 
         <Button
             android:id="@+id/editButton"
             android:layout_width="214dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/edit_mode" />
+            android:text="@string/startMem_button_edit_mode" />
 
         <Button
             android:id="@+id/backButton"
             android:layout_width="214dp"
             android:layout_height="wrap_content"
             android:layout_marginBottom="14dp"
-            android:text="@string/previous_activity" />
+            android:text="@string/startMem_button_prev_activity" />
     </LinearLayout>
 
 </RelativeLayout>

@@ -32,6 +32,7 @@ import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ViewerActivity extends Activity {
 	private static final String TAG = "ViewerActivity";
@@ -39,6 +40,7 @@ public class ViewerActivity extends Activity {
 	private int correctCount = 0;
 	private int wrongCount = 0;
     private boolean randomize = true; 
+    private String selectedFolder;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,10 +48,10 @@ public class ViewerActivity extends Activity {
         setContentView(R.layout.activity_viewer);
         
         Bundle bundle = this.getIntent().getExtras();
-        final String selectedFolder = bundle.getString("dbPath");
-        final String mode = bundle.getString("mode");
+        selectedFolder = bundle.getString("dbPath");
 
-        final String memPath = Environment.getExternalStorageDirectory().toString() + "/" + selectedFolder;
+        final String memPath = Environment.getExternalStorageDirectory().toString() + "/" + 
+        		getString(R.string.app_name) + "/" + selectedFolder;
         
         File folder = new File(memPath);
         
@@ -73,12 +75,13 @@ public class ViewerActivity extends Activity {
         memorizedButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				correctCount++;
 				if(photoIndex < photoPaths.length)
 				{
+					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
 					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 	 				ll.setVisibility(4);
 					nextPhoto(memPath, photoPaths[photoIndex]);
-					correctCount++;
 					Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
 					photoIndex++;
 				}
@@ -94,13 +97,15 @@ public class ViewerActivity extends Activity {
         notMemorizedButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				if(photoIndex < photoPaths.length-1)
+				wrongCount++;
+				if(photoIndex < photoPaths.length)
 				{
+					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
 					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 	 				ll.setVisibility(4);
-					nextPhoto(memPath, photoPaths[photoIndex++]);		
-					wrongCount++;
+					nextPhoto(memPath, photoPaths[photoIndex]);		
 					Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
+					photoIndex++;
 				}
 				else
 				{
@@ -171,13 +176,24 @@ public class ViewerActivity extends Activity {
     
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+    	Bundle extras;
+    	Intent intent;
     	switch(item.getItemId()){
     	case R.id.menu_start_over:
-    		startActivity(new Intent(ViewerActivity.this, ViewerActivity.class));
+    		extras = new Bundle();
+        	extras.putString("dbPath", selectedFolder);
+        	intent = new Intent(ViewerActivity.this,ViewerActivity.class);
+        	intent.putExtras(extras);          
+        	startActivity(intent);
+        	Toast.makeText(this, "Mem Restarted. Good Luck!", Toast.LENGTH_LONG).show();
     		finish();
     		return true;
     	case R.id.menu_memory_menu:
-    		startActivity(new Intent(ViewerActivity.this, StartMemoryActivity.class));
+    		extras = new Bundle();
+        	extras.putString("dbPath", selectedFolder);
+        	intent = new Intent(ViewerActivity.this,StartMemoryActivity.class);
+        	intent.putExtras(extras);          
+        	startActivity(intent);
     		finish();
     		return true;
     	case R.id.menu_settings:

@@ -67,7 +67,7 @@
 	        android:textStyle="bold"
 	        android:paddingLeft="5dp"
 	        android:paddingRight="5dp"
-	        android:text="@string/viewer_memorized" />
+	        android:text="@string/viewer_button_memorized" />
 	        
 	        <Button
 	        android:id="@+id/viewer_notMemorizedButton"
@@ -80,7 +80,7 @@
 	        android:textStyle="bold"
 	        android:paddingLeft="5dp"
 	        android:paddingRight="5dp"
-	        android:text="@string/viewer_not_memorized" />
+	        android:text="@string/viewer_button_not_memorized" />
         </LinearLayout>
     </LinearLayout>
 
