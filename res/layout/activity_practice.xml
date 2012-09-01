@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="150dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         android:background="#000000"
@@ -19,6 +19,7 @@
         
         <ImageView
 		    android:id="@+id/practice_imageView"
+		    android:contentDescription="This is an image"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content" 
 		    />
@@ -38,36 +39,15 @@
         
         <TextView
         android:id="@+id/practice_photoName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:ems="12" 
-        android:textSize="12pt"
-        android:maxLines="2"
-        android:gravity="center"
-        android:text="Test">
+        style="@style/ButtonText">
    		</TextView>
    		
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="15dp"
-            android:orientation="horizontal" >
-
-            <Button
+        <Button
                 android:id="@+id/practice_nextButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_weight="2.50"
-                android:background="#008000"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:text="@string/practice_button_next"
-                android:textColor="#FFFFFF"
-                android:textStyle="bold" />
-        </LinearLayout>
+                android:background="@drawable/green_button"
+                style="@style/ButtonText"
+                android:text="@string/practice_button_next"/>
+   		
 
     </LinearLayout>
 
