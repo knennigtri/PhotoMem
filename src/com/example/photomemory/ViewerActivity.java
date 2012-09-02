@@ -41,7 +41,6 @@ public class ViewerActivity extends Activity {
 	private int wrongCount = 0;
     private boolean randomize = true; 
     private String selectedFolder;
-    private String test;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
