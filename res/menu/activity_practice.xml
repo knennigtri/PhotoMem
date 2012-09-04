@@ -3,8 +3,20 @@
         android:title="@string/menu_edit"
         android:orderInCategory="100"
         android:showAsAction="never" />
+    <item android:id="@+id/menu_delete"
+        android:title="@string/menu_delete"
+        android:orderInCategory="90"
+        android:showAsAction="never" />
+    <item android:id="@+id/menu_rotate_left"
+        android:title="@string/menu_rotate_left"
+        android:orderInCategory="90"
+        android:showAsAction="never" />
+    <item android:id="@+id/menu_rotate_right"
+        android:title="@string/menu_rotate_right"
+        android:orderInCategory="90"
+        android:showAsAction="never" />
     <item android:id="@+id/menu_memory_menu"
         android:title="@string/menu_toMem_menu"
-        android:orderInCategory="100"
+        android:orderInCategory="80"
         android:showAsAction="never" />
 </menu>

@@ -29,114 +29,54 @@ public class PracticeActivity extends Activity {
     	private static final String TAG = "PracticeActivity";
     	private int photoIndex = 0;
         private boolean randomize = true; 
-        private String selectedFolder;
-        private String rootFolder = Environment.getExternalStorageDirectory().toString();
         private String[] photoPaths;
+        private CustomAlerts cAlerts;
+        private FileManagement fManagement;
         
     	@Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_practice);
-            
-            Bundle bundle = this.getIntent().getExtras();
-            selectedFolder = bundle.getString("dbPath");
 
-            final String memPath = rootFolder + "/" + 
-            		getString(R.string.app_name) + "/" + selectedFolder;
+            cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
+            fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
             
-            File folder = new File(memPath);
+            photoPaths = fManagement.getMemPhotos(); 
             
-            photoPaths = folder.list(new FilenameFilter(){  
-                @Override  
-                public boolean accept(File dir, String name)  
-                {  
-                    return ((name.endsWith(".jpg")));//||(name.endsWith(".png")));  
-                }  
-            }); 
+            Log.v(TAG, "#" + photoPaths.length);
             
             if(randomize) shuffleArray(photoPaths);
-           
-            for(int i = 0; i<photoPaths.length; i++)
-            	Log.v(TAG, i + " - " + photoPaths[i]);
-            
-            TextView tv = (TextView) findViewById(R.id.practice_photoName);
-			tv.setText(photoPaths[photoIndex].substring(0, photoPaths[photoIndex].length()-4));
-            nextPhoto(memPath, photoPaths[photoIndex]);
-           // photoIndex++;
-            Log.v(TAG, "index after first iteration: "+photoIndex);
+            nextPhoto();
                         
             final Button nextButton = (Button) findViewById(R.id.practice_nextButton);
             nextButton.setOnClickListener(new Button.OnClickListener() {
     			@Override
     			public void onClick(View arg0) {
     				photoIndex++;
-    				if(photoIndex < photoPaths.length)
-    				{
-    					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
-    					Log.v(TAG, "index after next iteration: "+photoIndex);
-    					LinearLayout ll = (LinearLayout) findViewById(R.id.practice_controlsFrame);
-    	 				ll.setVisibility(0);
-    	 				TextView tv = (TextView) findViewById(R.id.practice_photoName);
-         				tv.setText(photoPaths[photoIndex].substring(0, photoPaths[photoIndex].length()-4));
-         				nextPhoto(memPath, photoPaths[photoIndex]);		
-    					Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
-    				//	photoIndex++;
-    				}
-    				else
-    				{
-    					finish();
-    				}
+    				nextPhoto();
     			}
             	
             });
         }
         
-        private void nextPhoto(String memPath, String name){
-        	final String fullName = name;
-        	Bitmap bitmapImage = BitmapFactory.decodeFile(memPath + "/" + fullName); 
-            ImageView myImageView = (ImageView)findViewById(R.id.practice_imageView);
-             myImageView.setImageBitmap(bitmapImage);
-        }
-        
-        private void editPhotoAlert(final String prevName){
-        	AlertDialog.Builder alert = new AlertDialog.Builder(this); 
-
-            alert.setTitle("Edit Photo"); 
-            
-            final EditText name = new EditText(this);
-            name.setText(prevName);
-            
-            alert.setView(name); 
-
-            alert.setPositiveButton("Confirm", new DialogInterface.OnClickListener() { 
-                public void onClick(DialogInterface dialog, int whichButton) { 
-                	renamePhoto(name.getText().toString(), prevName);
-                	TextView tv = (TextView) findViewById(R.id.practice_photoName);
-                	tv.setText(name.getText().toString());
-                	Log.v(TAG, "Name changed to: " + name.getText().toString());
-                } 
-            }); 
-            alert.show();  
-        }
-
-        private void renamePhoto(String newName, String prevName){
-        	File file = new File(rootFolder + "/" + getString(R.string.app_name) + 
-        			"/" + selectedFolder + "/" + prevName);
-        	if(file.exists())
-        	{
-        		file.renameTo(new File(rootFolder + "/" + getString(R.string.app_name) + 
-        				"/" + selectedFolder + "/" + newName + ".jpg"));
-        		Log.v(TAG, "Changed to: " + rootFolder + "/" + getString(R.string.app_name) + 
-        				"/" + selectedFolder + "/" + newName + ".jpg");
-        	}
-        	else
-        	{
-        		Log.v(TAG, rootFolder + "/" + getString(R.string.app_name) + 
-        				"/" + selectedFolder + "/" + prevName + 
-        				" does not exist!");
-        	}
+    	private void nextPhoto(){
+    		if(photoIndex < photoPaths.length)
+			{
+				//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
+				Log.v(TAG, "index after next iteration: "+photoIndex);
+				LinearLayout ll = (LinearLayout) findViewById(R.id.practice_controlsFrame);
+ 				ll.setVisibility(0);
+ 				TextView tv = (TextView) findViewById(R.id.practice_photoName);
+ 				tv.setText(FileManagement.getPhotoName(photoPaths[photoIndex]));
+ 				fManagement.drawNextPhoto(photoPaths[photoIndex]);		
+ 				Log.v(TAG,"PhotoIndex=" + photoIndex);
+			}
+			else
+			{
+				finish();
+			}
     	}
-        
+    	
         /**
          * This is a simple method to randomize the array
          * @param arr - Array to be randomized
@@ -176,18 +116,26 @@ public class PracticeActivity extends Activity {
         	switch(item.getItemId()){
         	case R.id.menu_memory_menu:
         		extras = new Bundle();
-        		extras.putString("dbPath", selectedFolder);
+        		extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
         		intent = new Intent(PracticeActivity.this, StartMemoryActivity.class);
         		intent.putExtras(extras);
         		startActivity(intent);
         		finish();
         		return true;
         	case R.id.menu_edit: 
-        		editPhotoAlert(photoPaths[photoIndex]);
+        		cAlerts.editPhoto(this, fManagement, photoPaths[photoIndex]);
         		return true;
-        	case R.id.menu_settings: //TODO Settings page
-        		//startActivity(new Intent(PracticeActivity.this, Settings.class));
-        		finish();
+        	case R.id.menu_rotate_left:
+        		//TODO Create rotate Left
+        		return true;
+        	case R.id.menu_rotate_right:
+        		//TODO Create rotate Right
+        		return true;
+        	case R.id.menu_delete:
+        		//TODO Picture changes before deletion
+        		cAlerts.deletePhoto(this, fManagement,photoPaths[photoIndex]);
+        		photoIndex++;
+        		nextPhoto();
         		return true;
         	default:
         		return super.onOptionsItemSelected(item);

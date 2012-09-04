@@ -70,17 +70,16 @@ public class MainActivity extends ListActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
-            	String selectedFolder = aa.getItem(position);
-                Log.v(TAG, selectedFolder);
-                if(selectedFolder.contains(newDBString)){
-                	//TODO Create Add Mem Process
+            	String memFolder = aa.getItem(position);
+                Log.v(TAG, memFolder);
+                if(memFolder.contains(newDBString)){
                 	createMemAlert();
                 	Log.v(TAG, "Creating new Mem");
                 }
                 else
                 {
                 	Bundle extras = new Bundle();
-                	extras.putString("dbPath", selectedFolder);
+                	extras.putString("memFolder", memFolder);
                 	Intent intent = new Intent(MainActivity.this,StartMemoryActivity.class);
                 	intent.putExtras(extras);          
                 	startActivity(intent);
@@ -104,7 +103,7 @@ public class MainActivity extends ListActivity {
      * This creates an alert that gives input for Mems
      */
     private void createMemAlert(){           
-        AlertDialog.Builder alert = new AlertDialog.Builder(this); 
+    	AlertDialog.Builder alert = new AlertDialog.Builder(this); 
 
         alert.setTitle("Create a new Mem"); 
         alert.setMessage("Mem Name and Description"); 
@@ -232,8 +231,6 @@ public class MainActivity extends ListActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()){
     	case R.id.add_mem:
-    		//TODO Create Add Mem Process\
-    		//Open popup window
     		createMemAlert();
     		//if (p != null) showPopup(MainActivity.this, p);          	
     	case R.id.menu_about: //TODO Settings page

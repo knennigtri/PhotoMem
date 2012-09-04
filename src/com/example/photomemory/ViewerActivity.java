@@ -40,35 +40,25 @@ public class ViewerActivity extends Activity {
 	private int correctCount = 0;
 	private int wrongCount = 0;
     private boolean randomize = true; 
-    private String selectedFolder;
+    private CustomAlerts cAlerts;
+    private FileManagement fManagement;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
         
-        Bundle bundle = this.getIntent().getExtras();
-        selectedFolder = bundle.getString("dbPath");
-
-        final String memPath = Environment.getExternalStorageDirectory().toString() + "/" + 
-        		getString(R.string.app_name) + "/" + selectedFolder;
+        cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
+        fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
         
-        File folder = new File(memPath);
-        
-        final String[] photoPaths = folder.list(new FilenameFilter(){  
-            @Override  
-            public boolean accept(File dir, String name)  
-            {  
-                return ((name.endsWith(".jpg"))||(name.endsWith(".png")));  
-            }  
-        }); 
+        final String[] photoPaths = fManagement.getMemPhotos();
         
         if(randomize) shuffleArray(photoPaths);
        
         for(int i = 0; i<photoPaths.length; i++)
         	Log.v(TAG, i + " - " + photoPaths[i]);
         
-        nextPhoto(memPath, photoPaths[photoIndex]);
+        fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);
         photoIndex++;
         
         final Button memorizedButton = (Button) findViewById(R.id.viewer_memorizedButton);
@@ -81,7 +71,7 @@ public class ViewerActivity extends Activity {
 					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
 					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 	 				ll.setVisibility(4);
-					nextPhoto(memPath, photoPaths[photoIndex]);
+					fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);
 					Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
 					photoIndex++;
 				}
@@ -103,7 +93,7 @@ public class ViewerActivity extends Activity {
 					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
 					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 	 				ll.setVisibility(4);
-					nextPhoto(memPath, photoPaths[photoIndex]);		
+					fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);		
 					Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
 					photoIndex++;
 				}
@@ -122,24 +112,6 @@ public class ViewerActivity extends Activity {
 		Log.v(TAG, "Total wrong: " + wrongCount);
 		TextView tv = (TextView) findViewById(R.id.viewer_photoName);
 		tv.setText("Final Score: Memorized: " + correctCount + " Wrong: " + wrongCount);
-    }
-    
-    private void nextPhoto(String memPath, String name){
-    	final String fullName = name;
-    	Bitmap bitmapImage = BitmapFactory.decodeFile(memPath + "/" + fullName); 
-        ImageView myImageView = (ImageView)findViewById(R.id.viewer_imageView);
-         myImageView.setImageBitmap(bitmapImage);
-         myImageView.setOnTouchListener(new OnTouchListener() {
- 			@Override
- 			public boolean onTouch(View arg0, MotionEvent arg1) {
- 				TextView tv = (TextView) findViewById(R.id.viewer_photoName);
- 				tv.setText(fullName.substring(0, fullName.length()-4));
- 				LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
- 				ll.setVisibility(0);
- 				return false;
- 			}
-         	
-         });
     }
 
     /**
@@ -181,7 +153,7 @@ public class ViewerActivity extends Activity {
     	switch(item.getItemId()){
     	case R.id.menu_start_over:
     		extras = new Bundle();
-        	extras.putString("dbPath", selectedFolder);
+        	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
         	intent = new Intent(ViewerActivity.this,ViewerActivity.class);
         	intent.putExtras(extras);          
         	startActivity(intent);
@@ -190,7 +162,7 @@ public class ViewerActivity extends Activity {
     		return true;
     	case R.id.menu_memory_menu:
     		extras = new Bundle();
-        	extras.putString("dbPath", selectedFolder);
+        	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
         	intent = new Intent(ViewerActivity.this,StartMemoryActivity.class);
         	intent.putExtras(extras);          
         	startActivity(intent);

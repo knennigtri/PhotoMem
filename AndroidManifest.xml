@@ -42,12 +42,6 @@
             <intent-filter>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".AddMemActivity"
-            android:theme="@android:style/Theme.NoTitleBar">
-            <intent-filter>
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
