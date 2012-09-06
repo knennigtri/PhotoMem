@@ -1,8 +1,11 @@
 package com.example.photomemory;
 
 import java.io.File;
+import java.util.ArrayList;
+
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.app.Activity;
@@ -21,9 +24,9 @@ import android.widget.Toast;
 
 public class StartMemoryActivity extends Activity {
 	private static final String TAG = "StartMemoryActivity";
-	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
-	private static final int REQUEST_CHOOSE_IMAGE = 200;
-	private static final int REQUEST_CHOOSE_FOLDER = 300;
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
+	private static final int REQUEST_CHOOSE_IMAGE = 2;
+	private static final int REQUEST_CHOOSE_MULTI_IMAGE = 3;
 	private String memFolder;
 	private CustomAlerts cAlerts;
 	private FileManagement fManagement;
@@ -44,11 +47,17 @@ public class StartMemoryActivity extends Activity {
         startButton.setOnClickListener(new Button.OnClickListener() {
         	@Override
         	public void onClick(View arg0){
-        		Bundle extras = new Bundle();
-            	extras.putString("memFolder", memFolder);
-            	Intent intent = new Intent(StartMemoryActivity.this,ViewerActivity.class);
-            	intent.putExtras(extras);          
-            	startActivity(intent);
+        		if(fManagement.hasMemPhotos()){
+	        		Bundle extras = new Bundle();
+	            	extras.putString("memFolder", memFolder);
+	            	Intent intent = new Intent(StartMemoryActivity.this,ViewerActivity.class);
+	            	intent.putExtras(extras);          
+	            	startActivity(intent);
+        		}
+        		else
+        		{
+        			toastMessage("No Photos found, click Add Photo","long");
+        		}
         	}
         });
         
@@ -56,11 +65,17 @@ public class StartMemoryActivity extends Activity {
         practiceButton.setOnClickListener(new Button.OnClickListener() {
         	@Override
         	public void onClick(View arg0){
-        		Bundle extras = new Bundle();
-            	extras.putString("memFolder", memFolder);
-            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
-            	intent.putExtras(extras);          
-            	startActivity(intent);
+        		if(fManagement.hasMemPhotos()){
+	        		Bundle extras = new Bundle();
+	            	extras.putString("memFolder", memFolder);
+	            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
+	            	intent.putExtras(extras);          
+	            	startActivity(intent);
+        		}
+        		else
+        		{
+        			toastMessage("No Photos found. To add photos to this Mem, click " + getString(R.string.startMem_button_add_photo),"long");
+        		}
         	}
         });
         
@@ -83,6 +98,16 @@ public class StartMemoryActivity extends Activity {
 			}
         	
         });        
+    }
+    
+    private void toastMessage(String m, String len){
+    	if(len.equals("long")){
+    		Toast.makeText(this, m, Toast.LENGTH_LONG).show();
+    	}
+    	else
+    	{
+    		Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
+    	}
     }
     
     private void PhotoSelectorInflator(){
@@ -108,8 +133,7 @@ public class StartMemoryActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				Log.v(TAG,"select Photo Clicked");
-				Intent choosePictureIntent = new Intent(Intent.ACTION_PICK, Images.Media.INTERNAL_CONTENT_URI);
-		    	startActivityForResult(choosePictureIntent, REQUEST_CHOOSE_IMAGE);
+				selectPhoto();
 			}
         });
         final Button selectFolder = new Button(this);
@@ -147,8 +171,15 @@ public class StartMemoryActivity extends Activity {
 	    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
     }
     
+    private void selectPhoto(){
+    	Intent choosePictureIntent = new Intent(Intent.ACTION_PICK, Images.Media.INTERNAL_CONTENT_URI);
+    	startActivityForResult(choosePictureIntent, REQUEST_CHOOSE_IMAGE);
+    }
+    
     private void selectFolder(){
-    	//TODO Complete Select Folder
+    	//TODO Complete Select Folder - Need to create custom Gallery
+    //	Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE, Images.Media.INTERNAL_CONTENT_URI);
+    //	startActivityForResult(shareIntent, REQUEST_CHOOSE_MULTI_IMAGE);
     }
     
     private void restartActivity(){
@@ -174,9 +205,16 @@ public class StartMemoryActivity extends Activity {
                 fManagement.copyPhoto(getPath(data.getData()));
             }
         }
-        else if (requestCode == REQUEST_CHOOSE_FOLDER) {
+        else if (requestCode == REQUEST_CHOOSE_MULTI_IMAGE) {
             if (resultCode == RESULT_OK) {
             	//TODO onActivityResult Folder
+            	if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()) && data.hasExtra(Intent.EXTRA_STREAM)) { 
+            	    ArrayList<Parcelable> list = data.getParcelableArrayListExtra(Intent.EXTRA_STREAM); 
+            	    for (Parcelable p : list) { 
+            	       Uri uri = (Uri) p; 
+            	       Log.v(TAG, "URI: " + uri.getPath());
+            	   } 
+            	} 
             }
         }
         restartActivity();

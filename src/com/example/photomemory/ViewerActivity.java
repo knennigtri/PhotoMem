@@ -37,48 +37,39 @@ import android.widget.Toast;
 public class ViewerActivity extends Activity {
 	private static final String TAG = "ViewerActivity";
 	private int photoIndex = 0;
+	private String[] photoPaths;
 	private int correctCount = 0;
 	private int wrongCount = 0;
     private boolean randomize = true; 
     private CustomAlerts cAlerts;
     private FileManagement fManagement;
+    private Bitmap bitmapImage;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+		//TODO Put up a counter on the screen 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewer);
         
         cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
         fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
         
-        final String[] photoPaths = fManagement.getMemPhotos();
+        photoPaths = fManagement.getMemPhotos();
         
         if(randomize) shuffleArray(photoPaths);
        
         for(int i = 0; i<photoPaths.length; i++)
         	Log.v(TAG, i + " - " + photoPaths[i]);
         
-        fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);
-        photoIndex++;
+        nextPhoto();
         
         final Button memorizedButton = (Button) findViewById(R.id.viewer_memorizedButton);
         memorizedButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				correctCount++;
-				if(photoIndex < photoPaths.length)
-				{
-					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
-					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
-	 				ll.setVisibility(4);
-					fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);
-					Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
-					photoIndex++;
-				}
-				else
-				{
-					photoMemoryEnd();
-				}
+				Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
+				nextPhoto();
 			}
         	
         });
@@ -88,24 +79,41 @@ public class ViewerActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				wrongCount++;
-				if(photoIndex < photoPaths.length)
-				{
-					//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
-					LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
-	 				ll.setVisibility(4);
-					fManagement.nextPhotoWithOnTouchListener(photoPaths[photoIndex]);		
-					Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
-					photoIndex++;
-				}
-				else
-				{
-					photoMemoryEnd();
-				}
+				Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
+				nextPhoto();
 			}
         	
         });
     }
     
+	private void nextPhoto(){
+		if(photoIndex < photoPaths.length)
+		{
+			LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
+			ll.setVisibility(4);
+			ImageView photoView = (ImageView) findViewById(R.id.viewer_imageView);
+		        
+			bitmapImage = fManagement.drawNextPhoto(photoPaths[photoIndex], 500, 500);	
+			photoView.setImageBitmap(bitmapImage);
+			photoView.setOnTouchListener(new OnTouchListener() {
+	 			@Override
+	 			public boolean onTouch(View arg0, MotionEvent arg1) {
+	 				TextView tv = (TextView) findViewById(R.id.viewer_photoName);
+	 				tv.setText(FileManagement.getPhotoName(photoPaths[photoIndex]));
+	 				LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
+	 				ll.setVisibility(0);
+	 				return false;
+	 			}
+	         	
+	         });
+			photoIndex++;
+		}
+		else
+		{
+			photoMemoryEnd();
+		}
+	}
+	
     private void photoMemoryEnd(){
     	Log.v(TAG, "Total Photos Iterated: " + photoIndex);
 		Log.v(TAG, "Total correct: " + correctCount);

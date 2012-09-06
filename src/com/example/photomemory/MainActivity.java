@@ -62,7 +62,7 @@ public class MainActivity extends ListActivity {
         	}
         }
         
-        final ArrayAdapter<String> aa = new ArrayAdapter<String>(this,R.layout.list_item,listItems);
+        final ArrayAdapter<String> aa = new ArrayAdapter<String>(this,R.layout.main_list_item,listItems);
         setListAdapter(aa);
         
         //This creates a listener for the Files listed

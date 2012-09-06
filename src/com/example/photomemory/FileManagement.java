@@ -12,6 +12,8 @@ import java.io.OutputStream;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.os.Environment;
 import android.provider.MediaStore.Files;
 import android.util.Log;
@@ -31,7 +33,7 @@ public class FileManagement {
 	public String memFolderPath;
 	
 	public FileManagement(Activity a, String folder){
-		Log.e(TAG, "FileManagement Constructor");
+		Log.d(TAG, "FileManagement Constructor");
 		memFolder = folder;
 		_activity = a;
 		memFolderPath = ROOTFOLDER + "/" + _activity.getString(R.string.app_name) + 
@@ -104,40 +106,71 @@ public class FileManagement {
     	}
     }
     
+    public boolean hasMemPhotos(){
+    	File f = new File(memFolderPath);
+    	String[] list = f.list(new FilenameFilter(){  
+            @Override  
+            public boolean accept(File dir, String name)  
+            {  
+            	for(int i = 0;i<acceptedExtensions.length;i++)
+            	{
+            		if(name.endsWith(acceptedExtensions[i]))
+            			return true;  
+            	}
+            	return false;
+            }  
+        });
+    	Log.v(TAG, "list len: " + list.length);
+    	if(list.length > 0)
+    		return true;
+    	return false;
+    }
+    
     public String[] getMemPhotos(){
     	File folder = new File(memFolderPath);
     	return folder.list(new FilenameFilter(){  
             @Override  
             public boolean accept(File dir, String name)  
             {  
-                return ((name.endsWith(".jpg")));//||(name.endsWith(".png")));  
+            	for(int i = 0;i<acceptedExtensions.length;i++)
+            	{
+            		if(name.endsWith(acceptedExtensions[i]))
+            			return true;  
+            	}
+            	return false;  
             }  
         });
     }
     
-    public void drawNextPhoto(String name){
-    	final String fullName = name;
-    	Bitmap bitmapImage = BitmapFactory.decodeFile(memFolderPath + "/" + fullName); 
-        ImageView myImageView = (ImageView)_activity.findViewById(R.id.practice_imageView);
-         myImageView.setImageBitmap(bitmapImage);
+    public static int calculateInSampleSize(BitmapFactory.Options o, int reqWidth, int reqHeight) {
+	    // Raw height and width of image
+	    final int height = o.outHeight;
+	    final int width = o.outWidth;
+	    int inSampleSize = 1;
+	
+	    if (height > reqHeight || width > reqWidth) {
+	        if (width > height) {
+	            inSampleSize = Math.round((float)height / (float)reqHeight);
+	        } else {
+	            inSampleSize = Math.round((float)width / (float)reqWidth);
+	        }
+	    }
+	    return inSampleSize;
     }
     
-    public void nextPhotoWithOnTouchListener(String name){
-    	final String fullName = name;
-    	Bitmap bitmapImage = BitmapFactory.decodeFile(memFolderPath + "/" + fullName); 
-        ImageView myImageView = (ImageView)_activity.findViewById(R.id.viewer_imageView);
-         myImageView.setImageBitmap(bitmapImage);
-         myImageView.setOnTouchListener(new OnTouchListener() {
- 			@Override
- 			public boolean onTouch(View arg0, MotionEvent arg1) {
- 				TextView tv = (TextView) _activity.findViewById(R.id.viewer_photoName);
- 				tv.setText(fullName.substring(0, fullName.length()-4));
- 				LinearLayout ll = (LinearLayout) _activity.findViewById(R.id.viewer_controlsFrame);
- 				ll.setVisibility(0);
- 				return false;
- 			}
-         	
-         });
+    public Bitmap drawNextPhoto(String name, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(memFolderPath + "/" + name, options);
+
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(memFolderPath + "/" + name, options);
     }
     
     public static String getPhotoName(String name){

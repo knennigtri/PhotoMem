@@ -58,10 +58,13 @@ public final class R {
         public static final int activity_practice=0x7f030001;
         public static final int activity_start_memory=0x7f030002;
         public static final int activity_viewer=0x7f030003;
-        public static final int list_item=0x7f030004;
+        public static final int main_list_item=0x7f030004;
         public static final int new_photo_layout=0x7f030005;
         public static final int photo_chooser=0x7f030006;
-        public static final int tvtemplate=0x7f030007;
+        public static final int photo_viewer_layout=0x7f030007;
+        public static final int practice_controls=0x7f030008;
+        public static final int tvtemplate=0x7f030009;
+        public static final int viewer_controls=0x7f03000a;
     }
     public static final class menu {
         public static final int activity_main=0x7f060000;

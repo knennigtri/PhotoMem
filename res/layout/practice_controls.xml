@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/practice_controlsFrame"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="15dp"
+        
+        android:orientation="vertical" >
+        
+        <TextView
+        android:id="@+id/practice_photoName"
+        style="@style/ButtonText">
+   		</TextView>
+   		
+        <Button
+                android:id="@+id/practice_nextButton"
+                android:background="@drawable/green_button"
+                style="@style/ButtonText"
+                android:text="@string/practice_button_next"/>
+</LinearLayout>

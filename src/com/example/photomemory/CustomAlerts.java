@@ -45,7 +45,6 @@ public class CustomAlerts{
     }
 	
 	public void deletePhoto(final Context c, final FileManagement f, final String photoName){
-		//TODO Complete Delete alert
 		AlertDialog.Builder alert = new AlertDialog.Builder(c); 
 
         alert.setTitle("Delete " + photoName + "?"); 

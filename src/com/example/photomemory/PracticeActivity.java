@@ -32,6 +32,7 @@ public class PracticeActivity extends Activity {
         private String[] photoPaths;
         private CustomAlerts cAlerts;
         private FileManagement fManagement;
+        private Bitmap bitmapImage;
         
     	@Override
         public void onCreate(Bundle savedInstanceState) {
@@ -62,13 +63,18 @@ public class PracticeActivity extends Activity {
     	private void nextPhoto(){
     		if(photoIndex < photoPaths.length)
 			{
-				//TODO Fix Bitmap Problem  "Displaying Bitmaps Efficiently"
 				Log.v(TAG, "index after next iteration: "+photoIndex);
 				LinearLayout ll = (LinearLayout) findViewById(R.id.practice_controlsFrame);
  				ll.setVisibility(0);
+ 				
  				TextView tv = (TextView) findViewById(R.id.practice_photoName);
  				tv.setText(FileManagement.getPhotoName(photoPaths[photoIndex]));
- 				fManagement.drawNextPhoto(photoPaths[photoIndex]);		
+ 					
+ 				ImageView photoView = (ImageView) findViewById(R.id.practice_imageView);
+ 		        
+ 				bitmapImage = fManagement.drawNextPhoto(photoPaths[photoIndex], 500, 500);	
+ 				photoView.setImageBitmap(bitmapImage);
+ 				
  				Log.v(TAG,"PhotoIndex=" + photoIndex);
 			}
 			else
