@@ -1,4 +1,6 @@
-package com.example.photomemory;
+package com.nennig.photomem;
+
+import com.nennig.photomem.R;
 
 import android.app.Activity;
 import android.app.AlertDialog;

@@ -1,0 +1,47 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/mem_score_one"
+            style="@style/MemScoreText" />
+
+        <TextView
+            android:id="@+id/mem_score_two"
+            style="@style/MemScoreText" />
+
+        <TextView
+            android:id="@+id/mem_score_three"
+            style="@style/MemScoreText" />
+
+        <TextView
+            android:id="@+id/mem_score_four"
+            style="@style/MemScoreText" />
+    </LinearLayout>
+
+    <LinearLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="15dp"
+        >
+        
+        <Button
+        android:id="@+id/mem_score_button"
+        style="@style/ButtonText"
+        android:background="@drawable/blue_button"
+        android:text="@string/menu_toMem_menu" />
+        
+    </LinearLayout>
+    
+
+</RelativeLayout>

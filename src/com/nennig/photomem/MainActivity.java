@@ -1,10 +1,13 @@
-package com.example.photomemory;
+package com.nennig.photomem;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import com.nennig.photomem.R;
+
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;

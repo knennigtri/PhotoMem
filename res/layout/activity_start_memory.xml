@@ -9,36 +9,69 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="36dp"
+        android:layout_margin="5dp"
         android:orientation="vertical" >
 
+        <LinearLayout
+	        android:id="@+id/StatsContainer"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="vertical"
+	        android:layout_gravity="center">
+	        
+	        <TextView 
+            android:id="@+id/viewer_stats_completed"
+            android:text="Mem Completed X Times"
+            style="@style/MemStatsText"
+            />
+		    
+		    <TextView 
+            android:id="@+id/viewer_stats_memorized"
+            android:text="X% of Mem Memorized"
+            style="@style/MemStatsText"
+            />
+		    
+		    <TextView 
+            android:id="@+id/viewer_stats_extra"
+            android:text="OtherStats"
+            style="@style/MemStatsText"
+            />
+        </LinearLayout>
+
+        <CheckBox
+            android:id="@+id/start_random_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mix Photos Up" 
+            style="@style/MemStatsText"/>
+        
         <Button
             android:id="@+id/startButton"
-            android:background="@drawable/red_button"
+            android:background="@drawable/blue_button"
             style="@style/ButtonText"
             android:text="@string/startMem_button_start_game" />
 
         <Button
             android:id="@+id/practiceButton"
-            android:background="@drawable/red_button"
+            android:background="@drawable/blue_button"
             style="@style/ButtonText"
             android:text="@string/startMem_button_practice" />
         
         <Button
             android:id="@+id/addPhotoButton"
-            android:background="@drawable/red_button"
+            android:background="@drawable/blue_button"
             style="@style/ButtonText"
             android:text="@string/startMem_button_add_photo" />
 
         <Button
             android:id="@+id/editButton"
-            android:background="@drawable/red_button"
+            android:background="@drawable/blue_button"
             style="@style/ButtonText"
             android:text="@string/startMem_button_edit_mode" />
 
         <Button
             android:id="@+id/backButton"
-            android:background="@drawable/red_button"
+            android:background="@drawable/blue_button"
             style="@style/ButtonText"
             android:text="@string/startMem_button_prev_activity" />
     </LinearLayout>

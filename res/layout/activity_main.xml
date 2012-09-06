@@ -11,5 +11,6 @@
             android:background="#FFFFFF" 
             android:layout_weight="1"
             android:layout_gravity="center"
-            android:drawSelectorOnTop="false"/>
+            android:drawSelectorOnTop="false"
+            android:paddingTop="10dp"/>
 </LinearLayout>

@@ -1,4 +1,4 @@
-package com.example.photomemory;
+package com.nennig.photomem;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +8,9 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Random;
+
+import com.nennig.photomem.R;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -33,12 +36,11 @@ public class FileManagement {
 	public String memFolderPath;
 	
 	public FileManagement(Activity a, String folder){
-		Log.d(TAG, "FileManagement Constructor");
 		memFolder = folder;
 		_activity = a;
 		memFolderPath = ROOTFOLDER + "/" + _activity.getString(R.string.app_name) + 
     			"/" + memFolder;
-		Log.v(TAG, "Constructor: " + memFolderPath);
+		Log.d(TAG, "Constructor: " + memFolderPath);
 	}
 
     public void renamePhoto(String newName, String prevName){
@@ -142,6 +144,12 @@ public class FileManagement {
         });
     }
     
+    public String[] getShuffledMemPhotos(){
+    	String[] photos = getMemPhotos();
+    	shuffleArray(photos);
+    	return photos;
+    }
+    
     public static int calculateInSampleSize(BitmapFactory.Options o, int reqWidth, int reqHeight) {
 	    // Raw height and width of image
 	    final int height = o.outHeight;
@@ -183,4 +191,30 @@ public class FileManagement {
     	}   	
     	return name;
     }
+    
+    /**
+     * This is a simple method to randomize the array
+     * @param arr - Array to be randomized
+     */
+    private static void shuffleArray(String[] arr) {
+        int n = arr.length;
+        Random random = new Random();
+        random.nextInt();
+        for (int i = 0; i < n; i++) {
+          int change = i + random.nextInt(n - i);
+          swap(arr, i, change);
+        }
+      }
+
+    /**
+     * Simple swapping method
+     * @param arr - Array being randomized
+     * @param i - position of one element
+     * @param change - position of second element
+     */
+      private static void swap(String[] a, int i, int change) {
+        String helper = a[i];
+        a[i] = a[change];
+        a[change] = helper;
+      }
 }

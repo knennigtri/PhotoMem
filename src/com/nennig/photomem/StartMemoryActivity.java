@@ -1,7 +1,9 @@
-package com.example.photomemory;
+package com.nennig.photomem;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import com.nennig.photomem.R;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -30,18 +33,32 @@ public class StartMemoryActivity extends Activity {
 	private String memFolder;
 	private CustomAlerts cAlerts;
 	private FileManagement fManagement;
+	private boolean randomize = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         
         Bundle bundle = this.getIntent().getExtras();
-        memFolder = bundle.getString("memFolder");        
+        memFolder = bundle.getString("memFolder");  
+        randomize = bundle.getBoolean("memRandomize");
         this.setTitle(memFolder);
         
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_memory);
         cAlerts = new CustomAlerts(this, memFolder);
         fManagement = new FileManagement(this, memFolder);
+        
+        final CheckBox randButton = (CheckBox) findViewById(R.id.start_random_checkbox);
+        randButton.setOnClickListener(new CheckBox.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				if(randomize)
+					randomize = false;
+				else
+					randomize = true;
+			}
+
+        });
         
         final Button startButton = (Button) findViewById(R.id.startButton);
         startButton.setOnClickListener(new Button.OnClickListener() {
@@ -50,6 +67,7 @@ public class StartMemoryActivity extends Activity {
         		if(fManagement.hasMemPhotos()){
 	        		Bundle extras = new Bundle();
 	            	extras.putString("memFolder", memFolder);
+	            	extras.putBoolean("memRandomize", randomize);
 	            	Intent intent = new Intent(StartMemoryActivity.this,ViewerActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
@@ -68,6 +86,7 @@ public class StartMemoryActivity extends Activity {
         		if(fManagement.hasMemPhotos()){
 	        		Bundle extras = new Bundle();
 	            	extras.putString("memFolder", memFolder);
+	            	extras.putBoolean("memRandomize", randomize);
 	            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
@@ -79,6 +98,24 @@ public class StartMemoryActivity extends Activity {
         	}
         });
         
+        final Button addPhotoButton = (Button) findViewById(R.id.addPhotoButton);
+        addPhotoButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				PhotoSelectorInflator();
+			}
+        	
+        });
+        
+        final Button editButton = (Button) findViewById(R.id.editButton);
+        editButton.setOnClickListener(new Button.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				toastMessage("Currently not implemented. You can individually edit each photo in Practice mode.", "long");
+			}
+        	
+        });
+        
         final Button backButton = (Button) findViewById(R.id.backButton);
         backButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
@@ -88,16 +125,7 @@ public class StartMemoryActivity extends Activity {
 				StartMemoryActivity.this.finish();
 			}
         	
-        });
-        
-        final Button addPhotoButton = (Button) findViewById(R.id.addPhotoButton);
-        addPhotoButton.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				PhotoSelectorInflator();
-			}
-        	
-        });        
+        });       
     }
     
     private void toastMessage(String m, String len){
@@ -116,7 +144,7 @@ public class StartMemoryActivity extends Activity {
         LinearLayout ll = new LinearLayout(this);
         ll.setOrientation(LinearLayout.VERTICAL);
         final Button takePhoto = new Button(this);
-        takePhoto.setBackgroundResource(R.drawable.red_button);
+        takePhoto.setBackgroundResource(R.drawable.blue_button);
         takePhoto.setText("Take Photo");
         takePhoto.setOnClickListener(new Button.OnClickListener() {
 			@Override
@@ -126,7 +154,7 @@ public class StartMemoryActivity extends Activity {
 			}
         });
         final Button selectPhoto = new Button(this);
-        selectPhoto.setBackgroundResource(R.drawable.red_button);
+        selectPhoto.setBackgroundResource(R.drawable.blue_button);
         selectPhoto.setText("select Photo");
         
         selectPhoto.setOnClickListener(new Button.OnClickListener() {
@@ -137,13 +165,13 @@ public class StartMemoryActivity extends Activity {
 			}
         });
         final Button selectFolder = new Button(this);
-        selectFolder.setBackgroundResource(R.drawable.red_button);
+        selectFolder.setBackgroundResource(R.drawable.blue_button);
         selectFolder.setText("select Folder");
         selectFolder.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				Log.v(TAG,"select Folder Clicked");
-				selectFolder();
+				selectMultiPhotos();
 			}	
         });
         
@@ -176,19 +204,22 @@ public class StartMemoryActivity extends Activity {
     	startActivityForResult(choosePictureIntent, REQUEST_CHOOSE_IMAGE);
     }
     
-    private void selectFolder(){
+    private void selectMultiPhotos(){
     	//TODO Complete Select Folder - Need to create custom Gallery
     //	Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE, Images.Media.INTERNAL_CONTENT_URI);
     //	startActivityForResult(shareIntent, REQUEST_CHOOSE_MULTI_IMAGE);
+    	Toast.makeText(this, "This is not implemented yet.", Toast.LENGTH_SHORT).show();
+    	restartActivity("This is not implemented yet.");
     }
     
-    private void restartActivity(){
+    private void restartActivity(String toastStr){
     	Bundle extras = new Bundle();
     	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
+    	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
     	Intent intent = new Intent(StartMemoryActivity.this,StartMemoryActivity.class);
     	intent.putExtras(extras);          
     	startActivity(intent);
-    	Toast.makeText(this, "Photo added to Mem", Toast.LENGTH_SHORT).show();
+    	Toast.makeText(this, toastStr, Toast.LENGTH_SHORT).show();
 		finish();
     }
     
@@ -217,7 +248,7 @@ public class StartMemoryActivity extends Activity {
             	} 
             }
         }
-        restartActivity();
+        restartActivity("Photo added to Mem");
     }
     
     public String getPath(Uri uri) {

@@ -1,34 +1,21 @@
-package com.example.photomemory;
+package com.nennig.photomem;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.text.DecimalFormat;
 import java.util.Random;
 
-import android.net.Uri;
-import android.opengl.Visibility;
+import com.nennig.photomem.R;
+
 import android.os.Bundle;
-import android.os.Environment;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Gallery;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -38,9 +25,8 @@ public class ViewerActivity extends Activity {
 	private static final String TAG = "ViewerActivity";
 	private int photoIndex = 0;
 	private String[] photoPaths;
-	private int correctCount = 0;
+	private int memorizedCount = 0;
 	private int wrongCount = 0;
-    private boolean randomize = true; 
     private CustomAlerts cAlerts;
     private FileManagement fManagement;
     private Bitmap bitmapImage;
@@ -48,18 +34,18 @@ public class ViewerActivity extends Activity {
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		//TODO Put up a counter on the screen 
-        super.onCreate(savedInstanceState);
+        super.onCreate(savedInstanceState);        
         setContentView(R.layout.activity_viewer);
-        
         cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
         fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
+        boolean randomize = this.getIntent().getExtras().getBoolean("memRandomize");
         
-        photoPaths = fManagement.getMemPhotos();
+        if(randomize) 
+        	photoPaths = fManagement.getShuffledMemPhotos();
+        else
+        	photoPaths = fManagement.getMemPhotos();
         
-        if(randomize) shuffleArray(photoPaths);
-       
-        for(int i = 0; i<photoPaths.length; i++)
-        	Log.v(TAG, i + " - " + photoPaths[i]);
+        Log.v(TAG, "#" + photoPaths.length);
         
         nextPhoto();
         
@@ -67,7 +53,10 @@ public class ViewerActivity extends Activity {
         memorizedButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				correctCount++;
+				memorizedCount++;
+				TextView memorized = (TextView) findViewById(R.id.viewer_memorized);
+				memorized.setText("" + memorizedCount);
+				
 				Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
 				nextPhoto();
 			}
@@ -79,6 +68,9 @@ public class ViewerActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				wrongCount++;
+				TextView wrong = (TextView) findViewById(R.id.viewer_wrong);
+				wrong.setText("" + wrongCount);
+				
 				Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
 				nextPhoto();
 			}
@@ -89,6 +81,9 @@ public class ViewerActivity extends Activity {
 	private void nextPhoto(){
 		if(photoIndex < photoPaths.length)
 		{
+			TextView counter = (TextView) findViewById(R.id.viewer_picture_counter);
+			counter.setText((photoIndex + 1) + "/" + photoPaths.length);
+			
 			LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 			ll.setVisibility(4);
 			ImageView photoView = (ImageView) findViewById(R.id.viewer_imageView);
@@ -99,7 +94,7 @@ public class ViewerActivity extends Activity {
 	 			@Override
 	 			public boolean onTouch(View arg0, MotionEvent arg1) {
 	 				TextView tv = (TextView) findViewById(R.id.viewer_photoName);
-	 				tv.setText(FileManagement.getPhotoName(photoPaths[photoIndex]));
+	 				tv.setText(FileManagement.getPhotoName(photoPaths[photoIndex-1]));
 	 				LinearLayout ll = (LinearLayout) findViewById(R.id.viewer_controlsFrame);
 	 				ll.setVisibility(0);
 	 				return false;
@@ -116,37 +111,29 @@ public class ViewerActivity extends Activity {
 	
     private void photoMemoryEnd(){
     	Log.v(TAG, "Total Photos Iterated: " + photoIndex);
-		Log.v(TAG, "Total correct: " + correctCount);
+		Log.v(TAG, "Total correct: " + memorizedCount);
 		Log.v(TAG, "Total wrong: " + wrongCount);
+		
+		
 		TextView tv = (TextView) findViewById(R.id.viewer_photoName);
-		tv.setText("Final Score: Memorized: " + correctCount + " Wrong: " + wrongCount);
+		tv.setText("Final Score: Memorized: " + memorizedCount + " Wrong: " + wrongCount);
+
+		
+		Bundle extras = new Bundle();
+    	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
+    	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
+    	
+    	DecimalFormat twoDec = new DecimalFormat("#.##");
+    	String[] stats = {String.valueOf(memorizedCount),
+    			String.valueOf(wrongCount),
+    			String.valueOf(twoDec.format(((double) memorizedCount/photoPaths.length)*100))};
+    	
+    	extras.putStringArray("memStats", stats);
+    	Intent intent = new Intent(ViewerActivity.this,MemScoreActivity.class);
+    	intent.putExtras(extras);          
+    	startActivity(intent);
+		finish();
     }
-
-    /**
-     * This is a simple method to randomize the array
-     * @param arr - Array to be randomized
-     */
-    public static void shuffleArray(String[] arr) {
-        int n = arr.length;
-        Random random = new Random();
-        random.nextInt();
-        for (int i = 0; i < n; i++) {
-          int change = i + random.nextInt(n - i);
-          swap(arr, i, change);
-        }
-      }
-
-    /**
-     * Simple swapping method
-     * @param arr - Array being randomized
-     * @param i - position of one element
-     * @param change - position of second element
-     */
-      private static void swap(String[] a, int i, int change) {
-        String helper = a[i];
-        a[i] = a[change];
-        a[change] = helper;
-      }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -162,6 +149,7 @@ public class ViewerActivity extends Activity {
     	case R.id.menu_start_over:
     		extras = new Bundle();
         	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
+        	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
         	intent = new Intent(ViewerActivity.this,ViewerActivity.class);
         	intent.putExtras(extras);          
         	startActivity(intent);

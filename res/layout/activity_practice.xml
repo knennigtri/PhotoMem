@@ -6,15 +6,7 @@
 
     <LinearLayout
         android:id="@+id/practice_photoFrame"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="140dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:background="#000000"
-        android:orientation="vertical" 
+       style="@style/PhotoLayout"
         >
         
         <ImageView
