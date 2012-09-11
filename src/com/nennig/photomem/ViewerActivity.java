@@ -22,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class ViewerActivity extends Activity {
+
 	private static final String TAG = "ViewerActivity";
 	private int photoIndex = 0;
 	private String[] photoPaths;
@@ -30,22 +31,37 @@ public class ViewerActivity extends Activity {
     private CustomAlerts cAlerts;
     private FileManagement fManagement;
     private Bitmap bitmapImage;
+    private  boolean _randomize;
+    private String _current_mem;
     
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-		//TODO Put up a counter on the screen 
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.activity_viewer);
-        cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
-        fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
-        boolean randomize = this.getIntent().getExtras().getBoolean("memRandomize");
         
-        if(randomize) 
-        	photoPaths = fManagement.getShuffledMemPhotos();
+        if(savedInstanceState !=null)
+        {
+        	_current_mem = savedInstanceState.getString(Mem.CURRENT_MEM);
+        	_randomize = savedInstanceState.getBoolean(Mem.RANDOMIZE);
+        	cAlerts = new CustomAlerts(this, _current_mem);
+            fManagement = new FileManagement(this, _current_mem);
+            photoIndex = savedInstanceState.getInt("photoIndex");
+            photoPaths = savedInstanceState.getStringArray("photoPaths");
+        }
         else
-        	photoPaths = fManagement.getMemPhotos();
+        {
+        	_current_mem =getIntent().getStringExtra(Mem.CURRENT_MEM);
+        	_randomize = getIntent().getExtras().getBoolean(Mem.RANDOMIZE);
+        	cAlerts = new CustomAlerts(this, getIntent().getExtras().getString(Mem.CURRENT_MEM));
+	        fManagement = new FileManagement(this, getIntent().getExtras().getString(Mem.CURRENT_MEM));
+	        
+	        if(_randomize) 
+	        	photoPaths = fManagement.getShuffledMemPhotos();
+	        else
+	        	photoPaths = fManagement.getMemPhotos();
+        }
         
-        Log.v(TAG, "#" + photoPaths.length);
+        Log.d(TAG, "#" + photoPaths.length);
         
         nextPhoto();
         
@@ -57,7 +73,7 @@ public class ViewerActivity extends Activity {
 				TextView memorized = (TextView) findViewById(R.id.viewer_memorized);
 				memorized.setText("" + memorizedCount);
 				
-				Log.v(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
+				Log.d(TAG,"Photo Memorized. PhotoIndex=" + photoIndex);
 				nextPhoto();
 			}
         	
@@ -71,7 +87,7 @@ public class ViewerActivity extends Activity {
 				TextView wrong = (TextView) findViewById(R.id.viewer_wrong);
 				wrong.setText("" + wrongCount);
 				
-				Log.v(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
+				Log.d(TAG,"Photo Not Memorized PhotoIndex=" + photoIndex);
 				nextPhoto();
 			}
         	
@@ -110,27 +126,23 @@ public class ViewerActivity extends Activity {
 	}
 	
     private void photoMemoryEnd(){
-    	Log.v(TAG, "Total Photos Iterated: " + photoIndex);
-		Log.v(TAG, "Total correct: " + memorizedCount);
-		Log.v(TAG, "Total wrong: " + wrongCount);
+    	Log.d(TAG, "Total Photos Iterated: " + photoIndex);
+		Log.d(TAG, "Total correct: " + memorizedCount);
+		Log.d(TAG, "Total wrong: " + wrongCount);
 		
 		
 		TextView tv = (TextView) findViewById(R.id.viewer_photoName);
 		tv.setText("Final Score: Memorized: " + memorizedCount + " Wrong: " + wrongCount);
-
-		
-		Bundle extras = new Bundle();
-    	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
-    	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
     	
     	DecimalFormat twoDec = new DecimalFormat("#.##");
     	String[] stats = {String.valueOf(memorizedCount),
     			String.valueOf(wrongCount),
     			String.valueOf(twoDec.format(((double) memorizedCount/photoPaths.length)*100))};
     	
-    	extras.putStringArray("memStats", stats);
     	Intent intent = new Intent(ViewerActivity.this,MemScoreActivity.class);
-    	intent.putExtras(extras);          
+    	intent.putExtra(Mem.CURRENT_MEM, _current_mem);
+    	intent.putExtra(Mem.RANDOMIZE, _randomize);  
+    	intent.putExtra(Mem.MEM_STATS, stats);
     	startActivity(intent);
 		finish();
     }
@@ -147,29 +159,32 @@ public class ViewerActivity extends Activity {
     	Intent intent;
     	switch(item.getItemId()){
     	case R.id.menu_start_over:
-    		extras = new Bundle();
-        	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
-        	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
         	intent = new Intent(ViewerActivity.this,ViewerActivity.class);
-        	intent.putExtras(extras);          
+        	intent.putExtra(Mem.CURRENT_MEM, _current_mem);
+        	intent.putExtra(Mem.RANDOMIZE, _randomize);     
         	startActivity(intent);
         	Toast.makeText(this, "Mem Restarted. Good Luck!", Toast.LENGTH_LONG).show();
     		finish();
     		return true;
     	case R.id.menu_memory_menu:
-    		extras = new Bundle();
-        	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
         	intent = new Intent(ViewerActivity.this,StartMemoryActivity.class);
-        	intent.putExtras(extras);          
+        	intent.putExtra(Mem.CURRENT_MEM, _current_mem);
+        	intent.putExtra(Mem.RANDOMIZE, _randomize);          
         	startActivity(intent);
-    		finish();
-    		return true;
-    	case R.id.menu_settings:
-    		//startActivity(new Intent(ViewerActivity.this, Settings.class));
     		finish();
     		return true;
     	default:
     		return super.onOptionsItemSelected(item);
     	}
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle b){
+    	b.putString(Mem.CURRENT_MEM, this.getIntent().getExtras().getString(Mem.CURRENT_MEM));
+    	b.putBoolean(Mem.RANDOMIZE, this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE));
+    	b.putStringArray(Mem.MEM_STATS, getIntent().getStringArrayExtra(Mem.MEM_STATS));
+    	b.putInt("photoIndex", photoIndex);
+    	b.putStringArray("photoPaths", photoPaths);
+    	super.onSaveInstanceState(b);
     }
 }

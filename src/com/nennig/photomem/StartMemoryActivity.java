@@ -1,7 +1,9 @@
 package com.nennig.photomem;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.nennig.photomem.R;
 
@@ -12,8 +14,8 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.Images;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.Menu;
@@ -21,8 +23,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class StartMemoryActivity extends Activity {
@@ -33,29 +35,47 @@ public class StartMemoryActivity extends Activity {
 	private String memFolder;
 	private CustomAlerts cAlerts;
 	private FileManagement fManagement;
-	private boolean randomize = false;
-
+	
+	private boolean _randomize;
+	private int _stats_timesCompleted;
+	private float _stats_completionRate;
+	private int _stats_perfectMem;
+	private String _mem_description;
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
+    	if(savedInstanceState != null){
+        	memFolder = savedInstanceState.getString(Mem.CURRENT_MEM);
+        	LoadPreferences(memFolder);
+        	_randomize = savedInstanceState.getBoolean(Mem.RANDOMIZE);
+        }
+        else
+        {
+	        Bundle bundle = this.getIntent().getExtras();
+	        memFolder = bundle.getString(Mem.CURRENT_MEM);  
+	        LoadPreferences(memFolder);
+        }
         
-        Bundle bundle = this.getIntent().getExtras();
-        memFolder = bundle.getString("memFolder");  
-        randomize = bundle.getBoolean("memRandomize");
-        this.setTitle(memFolder);
+        this.setTitle(_mem_description);
         
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_memory);
+        
         cAlerts = new CustomAlerts(this, memFolder);
         fManagement = new FileManagement(this, memFolder);
+        
+        setMemTexts();
         
         final CheckBox randButton = (CheckBox) findViewById(R.id.start_random_checkbox);
         randButton.setOnClickListener(new CheckBox.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if(randomize)
-					randomize = false;
+				if(_randomize)
+					_randomize = false;
 				else
-					randomize = true;
+					_randomize = true;
+				getPreferences(MODE_PRIVATE).edit().putBoolean(
+						memFolder + "." + Mem.RANDOMIZE, _randomize).commit();
 			}
 
         });
@@ -66,15 +86,16 @@ public class StartMemoryActivity extends Activity {
         	public void onClick(View arg0){
         		if(fManagement.hasMemPhotos()){
 	        		Bundle extras = new Bundle();
-	            	extras.putString("memFolder", memFolder);
-	            	extras.putBoolean("memRandomize", randomize);
+	            	extras.putString(Mem.CURRENT_MEM, memFolder);
+	            	extras.putBoolean(Mem.RANDOMIZE, _randomize);
 	            	Intent intent = new Intent(StartMemoryActivity.this,ViewerActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
+	            	finish();
         		}
         		else
         		{
-        			toastMessage("No Photos found, click Add Photo","long");
+        			Toast.makeText(StartMemoryActivity.this, "No Photos found, click Add Photo",Toast.LENGTH_LONG).show();
         		}
         	}
         });
@@ -85,15 +106,16 @@ public class StartMemoryActivity extends Activity {
         	public void onClick(View arg0){
         		if(fManagement.hasMemPhotos()){
 	        		Bundle extras = new Bundle();
-	            	extras.putString("memFolder", memFolder);
-	            	extras.putBoolean("memRandomize", randomize);
+	            	extras.putString(Mem.CURRENT_MEM, memFolder);
+	            	extras.putBoolean(Mem.RANDOMIZE, _randomize);
 	            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
+	            	finish();
         		}
         		else
         		{
-        			toastMessage("No Photos found. To add photos to this Mem, click " + getString(R.string.startMem_button_add_photo),"long");
+        			Toast.makeText(StartMemoryActivity.this, "No Photos found. To add photos to this Mem, click " + getString(R.string.startMem_button_add_photo),Toast.LENGTH_LONG).show();
         		}
         	}
         });
@@ -107,7 +129,8 @@ public class StartMemoryActivity extends Activity {
         	
         });
         
-        final Button editButton = (Button) findViewById(R.id.editButton);
+/*        final Button editButton = (Button) findViewById(R.id.editButton);
+        editButton.setVisibility(Button.INVISIBLE);
         editButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
@@ -115,7 +138,7 @@ public class StartMemoryActivity extends Activity {
 			}
         	
         });
-        
+*/
         final Button backButton = (Button) findViewById(R.id.backButton);
         backButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
@@ -128,14 +151,21 @@ public class StartMemoryActivity extends Activity {
         });       
     }
     
-    private void toastMessage(String m, String len){
-    	if(len.equals("long")){
-    		Toast.makeText(this, m, Toast.LENGTH_LONG).show();
-    	}
-    	else
-    	{
-    		Toast.makeText(this, m, Toast.LENGTH_SHORT).show();
-    	}
+    private void setMemTexts(){
+    	TextView desc = (TextView) findViewById(R.id.viewer_mem_description);
+    	desc.setText(memFolder);
+    	
+    	TextView timesCompleted = (TextView) findViewById(R.id.viewer_stats_completed);
+    	timesCompleted.setText("Mem completed " + _stats_timesCompleted + " times");
+   
+     	TextView completionRate = (TextView) findViewById(R.id.viewer_stats_memorized);
+    	completionRate.setText(_stats_completionRate + "% of Mem Memorized");
+    	
+    	TextView perfectMem = (TextView) findViewById(R.id.viewer_stats_perfect_mem);
+    	perfectMem.setText("Perfect Mem Completed " + _stats_perfectMem + " Times");
+    
+    	CheckBox cb = (CheckBox) findViewById(R.id.start_random_checkbox);
+    	cb.setChecked(_randomize);
     }
     
     private void PhotoSelectorInflator(){
@@ -149,10 +179,12 @@ public class StartMemoryActivity extends Activity {
         takePhoto.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Log.v(TAG,"Take Photo Clicked");
+				Log.d(TAG,"Take Photo Clicked");
 				takePhoto();
 			}
         });
+        ll.addView(takePhoto);
+        
         final Button selectPhoto = new Button(this);
         selectPhoto.setBackgroundResource(R.drawable.blue_button);
         selectPhoto.setText("select Photo");
@@ -160,25 +192,24 @@ public class StartMemoryActivity extends Activity {
         selectPhoto.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Log.v(TAG,"select Photo Clicked");
+				Log.d(TAG,"select Photo Clicked");
 				selectPhoto();
 			}
         });
-        final Button selectFolder = new Button(this);
+        ll.addView(selectPhoto);
+        
+/*        final Button selectFolder = new Button(this);
         selectFolder.setBackgroundResource(R.drawable.blue_button);
         selectFolder.setText("select Folder");
         selectFolder.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Log.v(TAG,"select Folder Clicked");
+				Log.d(TAG,"select Folder Clicked");
 				selectMultiPhotos();
 			}	
         });
-        
-        ll.addView(takePhoto);
-        ll.addView(selectPhoto);
         ll.addView(selectFolder);
-        
+*/        
         alert.setView(ll); 
         alert.show(); 
     
@@ -214,8 +245,8 @@ public class StartMemoryActivity extends Activity {
     
     private void restartActivity(String toastStr){
     	Bundle extras = new Bundle();
-    	extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
-    	extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
+    	extras.putString(Mem.CURRENT_MEM, this.getIntent().getExtras().getString(Mem.CURRENT_MEM));
+    	extras.putBoolean(Mem.RANDOMIZE, this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE));
     	Intent intent = new Intent(StartMemoryActivity.this,StartMemoryActivity.class);
     	intent.putExtras(extras);          
     	startActivity(intent);
@@ -232,22 +263,23 @@ public class StartMemoryActivity extends Activity {
         }
         else if (requestCode == REQUEST_CHOOSE_IMAGE) {
             if (resultCode == RESULT_OK) {
-                Log.v(TAG, "Picture Choosen: " + getPath(data.getData()));
+                Log.d(TAG, "Picture Choosen: " + getPath(data.getData()));
                 fManagement.copyPhoto(getPath(data.getData()));
             }
         }
-        else if (requestCode == REQUEST_CHOOSE_MULTI_IMAGE) {
+/*        else if (requestCode == REQUEST_CHOOSE_MULTI_IMAGE) {
             if (resultCode == RESULT_OK) {
             	//TODO onActivityResult Folder
             	if (Intent.ACTION_SEND_MULTIPLE.equals(data.getAction()) && data.hasExtra(Intent.EXTRA_STREAM)) { 
             	    ArrayList<Parcelable> list = data.getParcelableArrayListExtra(Intent.EXTRA_STREAM); 
             	    for (Parcelable p : list) { 
             	       Uri uri = (Uri) p; 
-            	       Log.v(TAG, "URI: " + uri.getPath());
+            	       Log.d(TAG, "URI: " + uri.getPath());
             	   } 
             	} 
             }
         }
+*/
         restartActivity("Photo added to Mem");
     }
     
@@ -271,6 +303,15 @@ public class StartMemoryActivity extends Activity {
 
     }
     
+    private void LoadPreferences(String name){
+    	SharedPreferences settings = getSharedPreferences(Mem.MY_PREFS,MODE_PRIVATE);
+        _mem_description = settings.getString(name + "." + Mem.DESCRIPTION, "");
+    	_stats_timesCompleted = settings.getInt(name + "." + Mem.TIMES_COMPLETED, 0);
+        _stats_completionRate = settings.getFloat(name + "." + Mem.COMPLETION_RATE, 0);
+        _stats_perfectMem = settings.getInt(name + "." + Mem.PERFECT_MEM, 0);
+        _randomize = settings.getBoolean(Mem.RANDOMIZE, false);
+    }
+    
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_start_memory, menu);
@@ -280,9 +321,9 @@ public class StartMemoryActivity extends Activity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
     	switch(item.getItemId()){
-    	case R.id.menu_settings:
-    		//TODO Create Settings Activity
-    		Toast.makeText(this, "Settings Inflate", Toast.LENGTH_SHORT).show();
+    	case R.id.menu_rate_this:
+    		String str ="https://play.google.com/store/apps/details?id=com.nennig.photomem";
+    		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
     		return true;
     	case R.id.menu_about: //TODO Settings page
     		//TODO Create About Me Page
@@ -291,5 +332,12 @@ public class StartMemoryActivity extends Activity {
     	default:
     		return super.onOptionsItemSelected(item);
     	}
+    }
+    
+    @Override
+    public void onSaveInstanceState(Bundle b){
+    	b.putString(Mem.CURRENT_MEM, this.getIntent().getExtras().getString(Mem.CURRENT_MEM));
+    	b.putBoolean(Mem.RANDOMIZE, this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE));
+    	super.onSaveInstanceState(b);
     }
 }

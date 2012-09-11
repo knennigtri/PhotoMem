@@ -40,7 +40,7 @@ public class CustomAlerts{
             	f.renamePhoto(name.getText().toString(), prevName);
             	TextView tv = (TextView) _activity.findViewById(R.id.practice_photoName);
             	tv.setText(FileManagement.getPhotoName(name.getText().toString()));
-            	Log.v(TAG, "Name changed to: " + name.getText().toString());
+            	Log.d(TAG, "Name changed to: " + name.getText().toString());
             } 
         }); 
         alert.show();  
@@ -79,7 +79,7 @@ public class CustomAlerts{
         alert.setPositiveButton("Add Photo", new DialogInterface.OnClickListener() { 
             public void onClick(DialogInterface dialog, int whichButton) { 
             	f.renamePhoto(name.getText().toString(), _activity.getString(R.string.default_photo_name));
-            	Log.v(TAG, name.getText().toString());
+            	Log.d(TAG, name.getText().toString());
             	Toast.makeText(c, "Photo Added to Mem!", Toast.LENGTH_LONG).show();
             } 
         }); 

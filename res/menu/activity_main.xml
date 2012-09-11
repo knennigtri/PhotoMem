@@ -5,6 +5,11 @@
         android:showAsAction="never" />
     <item android:id="@+id/menu_about"
         android:title="@string/menu_about"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:showAsAction="never" />
+    <item android:id="@+id/menu_rate_this"
+        android:title="@string/menu_rate_this"
+        android:orderInCategory="300"
+        android:showAsAction="never" >
+    </item>
 </menu>

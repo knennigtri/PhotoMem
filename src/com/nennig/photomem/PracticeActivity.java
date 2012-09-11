@@ -34,22 +34,37 @@ public class PracticeActivity extends Activity {
         private CustomAlerts cAlerts;
         private FileManagement fManagement;
         private Bitmap bitmapImage;
+        private  boolean _randomize;
+        private String _current_mem;
         
     	@Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_practice);
-
-            cAlerts = new CustomAlerts(this, this.getIntent().getExtras().getString("memFolder"));
-            fManagement = new FileManagement(this, this.getIntent().getExtras().getString("memFolder"));
-            boolean randomize = this.getIntent().getExtras().getBoolean("memRandomize");
-            
-            if(randomize)  
-            	photoPaths = fManagement.getShuffledMemPhotos();
+            if(savedInstanceState !=null)
+            {
+            	_current_mem = savedInstanceState.getString(Mem.CURRENT_MEM);
+            	_randomize = savedInstanceState.getBoolean(Mem.RANDOMIZE);
+            	cAlerts = new CustomAlerts(this, _current_mem);
+                fManagement = new FileManagement(this, _current_mem);
+                photoIndex = savedInstanceState.getInt("photoIndex");
+                photoPaths = savedInstanceState.getStringArray("photoPaths");
+            }
             else
-            	photoPaths = fManagement.getMemPhotos();
+            {
+            	_current_mem = getIntent().getExtras().getString(Mem.CURRENT_MEM);
+            	cAlerts = new CustomAlerts(this, _current_mem);
+                fManagement = new FileManagement(this, _current_mem);
+                _randomize = this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE);
+                
+                if(_randomize)  
+                	photoPaths = fManagement.getShuffledMemPhotos();
+                else
+                	photoPaths = fManagement.getMemPhotos();
+            }
             
-            Log.v(TAG, "#" + photoPaths.length);
+            
+            Log.d(TAG, "#" + photoPaths.length);
             nextPhoto();
                         
             final Button nextButton = (Button) findViewById(R.id.practice_nextButton);
@@ -66,7 +81,7 @@ public class PracticeActivity extends Activity {
     	private void nextPhoto(){
     		if(photoIndex < photoPaths.length)
 			{
-				Log.v(TAG, "index after next iteration: "+photoIndex);
+				Log.d(TAG, "index after next iteration: "+photoIndex);
 				LinearLayout ll = (LinearLayout) findViewById(R.id.practice_controlsFrame);
  				ll.setVisibility(0);
  				
@@ -78,7 +93,7 @@ public class PracticeActivity extends Activity {
  				bitmapImage = fManagement.drawNextPhoto(photoPaths[photoIndex], 500, 500);	
  				photoView.setImageBitmap(bitmapImage);
  				
- 				Log.v(TAG,"PhotoIndex=" + photoIndex);
+ 				Log.d(TAG,"PhotoIndex=" + photoIndex);
 			}
 			else
 			{
@@ -101,8 +116,8 @@ public class PracticeActivity extends Activity {
         	switch(item.getItemId()){
         	case R.id.menu_memory_menu:
         		extras = new Bundle();
-        		extras.putString("memFolder", this.getIntent().getExtras().getString("memFolder"));
-        		extras.putBoolean("memRandomize", this.getIntent().getExtras().getBoolean("memRandomize"));
+        		extras.putString(Mem.CURRENT_MEM, _current_mem);
+        		extras.putBoolean(Mem.RANDOMIZE, _randomize);
         		intent = new Intent(PracticeActivity.this, StartMemoryActivity.class);
         		intent.putExtras(extras);
         		startActivity(intent);
@@ -126,5 +141,15 @@ public class PracticeActivity extends Activity {
         	default:
         		return super.onOptionsItemSelected(item);
         	}
+        }
+        
+        @Override
+        public void onSaveInstanceState(Bundle b){
+        	b.putString(Mem.CURRENT_MEM, this.getIntent().getExtras().getString(Mem.CURRENT_MEM));
+        	b.putBoolean(Mem.RANDOMIZE, this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE));
+        	b.putStringArray(Mem.MEM_STATS, getIntent().getStringArrayExtra(Mem.MEM_STATS));
+        	b.putInt("photoIndex", photoIndex);
+        	b.putStringArray("photoPaths", photoPaths);
+        	super.onSaveInstanceState(b);
         }
     }

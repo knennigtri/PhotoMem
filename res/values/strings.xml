@@ -9,6 +9,7 @@
     <string name="viewer_menu_start_over">Start Over</string>
     <string name="menu_toMem_menu">Back to Mem Menu</string>
     <string name="main_menu_add_mem">Add Mem</string>
+    <string name="menu_rate_this">Rate PhotoMem</string>
     <string name="menu_edit">Edit Photo</string>
     <string name="menu_delete">Delete Photo</string>
     <string name="menu_rotate_left">Rotate Left</string>

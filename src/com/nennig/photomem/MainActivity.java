@@ -4,10 +4,13 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import com.nennig.photomem.R;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.app.Activity;
@@ -16,6 +19,8 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.Log;
@@ -39,6 +44,7 @@ import android.widget.Toast;
 
 
 public class MainActivity extends ListActivity {
+	
 	private static final String TAG = "MainActivity";
 	private static final String newDBString = "+ Create New Mem";
 	private static final String rootFolder = Environment.getExternalStorageDirectory().toString();
@@ -47,7 +53,6 @@ public class MainActivity extends ListActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        
         ArrayList<String> listItems=new ArrayList<String>();
         
         File[] folderPaths;
@@ -60,7 +65,7 @@ public class MainActivity extends ListActivity {
         {
         	for(int i = 0; i < folderPaths.length; i++)
         	{
-        		Log.v(TAG, folderPaths[i].getName());
+        		Log.d(TAG, folderPaths[i].getName());
         		listItems.add(folderPaths[i].getName());
         	}
         }
@@ -74,15 +79,15 @@ public class MainActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view,
                     int position, long id) {
             	String memFolder = aa.getItem(position);
-                Log.v(TAG, memFolder);
+                Log.d(TAG, memFolder);
                 if(memFolder.contains(newDBString)){
                 	createMemAlert();
-                	Log.v(TAG, "Creating new Mem");
+                	Log.d(TAG, "Creating new Mem");
                 }
                 else
                 {
                 	Bundle extras = new Bundle();
-                	extras.putString("memFolder", memFolder);
+                	extras.putString(Mem.CURRENT_MEM, memFolder);
                 	Intent intent = new Intent(MainActivity.this,StartMemoryActivity.class);
                 	intent.putExtras(extras);          
                 	startActivity(intent);
@@ -95,11 +100,17 @@ public class MainActivity extends ListActivity {
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
 					int position, long id) {
-				deleteMemAlert(aa.getItem(position));
+				manageMemAlert(aa.getItem(position));
 				return false;
 			}
         	
 		});
+    }
+    
+    public SQLiteDatabase openDatebase(){
+    	PhotoMemOpenHelper db = new PhotoMemOpenHelper(this);
+    	
+    	return null;
     }
     
     /**
@@ -124,8 +135,11 @@ public class MainActivity extends ListActivity {
 
         alert.setPositiveButton("Create", new DialogInterface.OnClickListener() { 
             public void onClick(DialogInterface dialog, int whichButton) { 
-            	createMem(name.getText().toString(),desc.getText().toString());
-            	Log.v(TAG, name.getText().toString() + " " + desc.getText().toString());
+            	String _name = name.getText().toString();
+            	String _desc = desc.getText().toString();
+            	setMemPrefs(_name, _desc);
+            	createMem(_name,_desc);
+            	Log.d(TAG, _name + " " + _desc);
             	startActivity(new Intent(MainActivity.this, MainActivity.class));
             	finish();
             } 
@@ -160,12 +174,75 @@ public class MainActivity extends ListActivity {
     		{
     			Log.e(TAG, e.getMessage());
     		}
-    		Log.v(TAG, "New Mem Created: " + name);
+    		Log.d(TAG, "New Mem Created: " + name);
     	}
     	else
     	{
     		Toast.makeText(this, "Mem already Exists!", Toast.LENGTH_SHORT).show();
     	}
+    }
+    
+    private void setMemPrefs(String name, String desc){
+    	SharedPreferences settings =  getSharedPreferences(Mem.MY_PREFS,MODE_PRIVATE);
+    	SharedPreferences.Editor e = settings.edit();
+    	e.putString(name + "." + Mem.MEM_NAME, name);
+    	e.putString(name + "." + Mem.DESCRIPTION, desc);
+    	
+    	SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"); 
+		Date date = new Date();
+    	
+    	e.putString(name + "." + Mem.TIME_CREATED, dateFormat.format(date));
+    	e.putInt(name + "." + Mem.TIMES_COMPLETED, 0);
+    	e.putFloat(name + "." + Mem.COMPLETION_RATE, 0);
+    	e.commit();
+    }
+    
+    private void manageMemAlert(final String memName){
+    	AlertDialog.Builder alert = new AlertDialog.Builder(this); 
+
+        alert.setTitle(memName); 
+        alert.setPositiveButton("Delete Mem", new DialogInterface.OnClickListener() { 
+            public void onClick(DialogInterface dialog, int whichButton) { 
+            	deleteMemAlert(memName);
+            } 
+        }); 
+        
+        alert.setNegativeButton("Edit Mem", new DialogInterface.OnClickListener() { 
+              public void onClick(DialogInterface dialog, int whichButton) { 
+                editMemAlert(memName); 
+              } 
+        }); 
+        alert.show();
+    }
+    
+    private void editMemAlert(final String memName){
+    	AlertDialog.Builder alert = new AlertDialog.Builder(this); 
+        alert.setTitle("Edit Mem Description"); 
+        
+        final EditText desc = new EditText(this);
+        
+        final SharedPreferences settings = getSharedPreferences(Mem.MY_PREFS, MODE_PRIVATE);
+        desc.setText(settings.getString(memName + "." + Mem.DESCRIPTION, ""));
+      
+        desc.setHint("description");
+        
+        LinearLayout ll = new LinearLayout(this);
+        ll.setOrientation(LinearLayout.VERTICAL);
+        ll.addView(desc);
+        alert.setView(ll); 
+
+        alert.setPositiveButton("Save", new DialogInterface.OnClickListener() { 
+            public void onClick(DialogInterface dialog, int whichButton) { 
+            	String str = desc.getText().toString();;
+            	settings.edit().putString(memName + "." + Mem.DESCRIPTION, str).commit();
+            } 
+        }); 
+        alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() { 
+              public void onClick(DialogInterface dialog, int whichButton) { 
+                // Canceled. 
+              } 
+        }); 
+        alert.show();  
     }
     
     /**
@@ -179,7 +256,7 @@ public class MainActivity extends ListActivity {
         alert.setMessage("Delete Mem?"); 
         alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() { 
             public void onClick(DialogInterface dialog, int whichButton) { 
-            	Log.v(TAG, rootFolder + "/" + getString(R.string.app_name) + "/" + memName);
+            	Log.d(TAG, rootFolder + "/" + getString(R.string.app_name) + "/" + memName);
             	deleteMem(memName);
             	startActivity(new Intent(MainActivity.this, MainActivity.class));
             	finish();
@@ -211,14 +288,14 @@ public class MainActivity extends ListActivity {
      */
     private File[] findPMFolders(String folderPath){
     	File folder = new File(folderPath);
-    	Log.v(TAG,folder.toString());
+    	Log.d(TAG,folder.toString());
     	if(!folder.exists()){
     		folder.mkdirs();
-    		Log.v(TAG, "Folder Created");
+    		Log.d(TAG, "Folder Created");
     	}
     	else
     	{
-    		Log.v(TAG, "The folder is already present");
+    		Log.d(TAG, "The folder is already present");
     	}
     	
     	return folder.listFiles();
@@ -238,6 +315,10 @@ public class MainActivity extends ListActivity {
     		//if (p != null) showPopup(MainActivity.this, p);          	
     	case R.id.menu_about: //TODO Settings page
     		//TODO Create About Me Page
+    		return true;
+    	case R.id.menu_rate_this:
+    		String str ="https://play.google.com/store/apps/details?id=com.nennig.photomem";
+    		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
     		return true;
     	default:
     		return super.onOptionsItemSelected(item);

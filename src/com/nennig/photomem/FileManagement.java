@@ -54,12 +54,12 @@ public class FileManagement {
 	    		{
 		    		if(newName.contains(acceptedExtensions[i])){
 		    			file.renameTo(new File(memFolderPath + "/" + newName));
-		        		Log.v(TAG, "Changed to: " + memFolderPath + "/" + newName);
+		        		Log.d(TAG, "Changed to: " + memFolderPath + "/" + newName);
 		    		}
 		    		else
 		    		{
 		    			file.renameTo(new File(memFolderPath + "/" + newName + acceptedExtensions[i]));
-		        		Log.v(TAG, "Changed to: " + memFolderPath + "/" + newName + acceptedExtensions[i]);
+		        		Log.d(TAG, "Changed to: " + memFolderPath + "/" + newName + acceptedExtensions[i]);
 		    		}
 	    		}
     		}
@@ -90,7 +90,7 @@ public class FileManagement {
     		}
     		in.close();
     		out.close();
-    		Log.v(TAG, name + " File copied.");
+    		Log.d(TAG, name + " File copied.");
     	}
 		catch(FileNotFoundException ex){
 		  Log.e(TAG, ex.getMessage() + " in the specified directory.");
@@ -122,7 +122,7 @@ public class FileManagement {
             	return false;
             }  
         });
-    	Log.v(TAG, "list len: " + list.length);
+    	Log.d(TAG, "list len: " + list.length);
     	if(list.length > 0)
     		return true;
     	return false;
