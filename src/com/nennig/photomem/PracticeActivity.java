@@ -41,11 +41,11 @@ public class PracticeActivity extends Activity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_practice);
+            cAlerts = new CustomAlerts(this);
             if(savedInstanceState !=null)
             {
             	_current_mem = savedInstanceState.getString(Mem.CURRENT_MEM);
             	_randomize = savedInstanceState.getBoolean(Mem.RANDOMIZE);
-            	cAlerts = new CustomAlerts(this, _current_mem);
                 fManagement = new FileManagement(this, _current_mem);
                 photoIndex = savedInstanceState.getInt("photoIndex");
                 photoPaths = savedInstanceState.getStringArray("photoPaths");
@@ -53,7 +53,6 @@ public class PracticeActivity extends Activity {
             else
             {
             	_current_mem = getIntent().getExtras().getString(Mem.CURRENT_MEM);
-            	cAlerts = new CustomAlerts(this, _current_mem);
                 fManagement = new FileManagement(this, _current_mem);
                 _randomize = this.getIntent().getExtras().getBoolean(Mem.RANDOMIZE);
                 

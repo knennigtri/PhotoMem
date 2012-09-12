@@ -29,9 +29,8 @@ import android.widget.Toast;
 
 public class StartMemoryActivity extends Activity {
 	private static final String TAG = "StartMemoryActivity";
-	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
-	private static final int REQUEST_CHOOSE_IMAGE = 2;
-	private static final int REQUEST_CHOOSE_MULTI_IMAGE = 3;
+
+//	private static final int REQUEST_CHOOSE_MULTI_IMAGE = 3;
 	private String memFolder;
 	private CustomAlerts cAlerts;
 	private FileManagement fManagement;
@@ -61,7 +60,7 @@ public class StartMemoryActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start_memory);
         
-        cAlerts = new CustomAlerts(this, memFolder);
+        cAlerts = new CustomAlerts(StartMemoryActivity.this);
         fManagement = new FileManagement(this, memFolder);
         
         setMemTexts();
@@ -124,7 +123,7 @@ public class StartMemoryActivity extends Activity {
         addPhotoButton.setOnClickListener(new Button.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				PhotoSelectorInflator();
+				cAlerts.AddPhotoAlert(StartMemoryActivity.this, memFolder);
 			}
         	
         });
@@ -168,80 +167,80 @@ public class StartMemoryActivity extends Activity {
     	cb.setChecked(_randomize);
     }
     
-    private void PhotoSelectorInflator(){
-    	AlertDialog.Builder alert = new AlertDialog.Builder(this);  
-
-        LinearLayout ll = new LinearLayout(this);
-        ll.setOrientation(LinearLayout.VERTICAL);
-        final Button takePhoto = new Button(this);
-        takePhoto.setBackgroundResource(R.drawable.blue_button);
-        takePhoto.setText("Take Photo");
-        takePhoto.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Log.d(TAG,"Take Photo Clicked");
-				takePhoto();
-			}
-        });
-        ll.addView(takePhoto);
-        
-        final Button selectPhoto = new Button(this);
-        selectPhoto.setBackgroundResource(R.drawable.blue_button);
-        selectPhoto.setText("select Photo");
-        
-        selectPhoto.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Log.d(TAG,"select Photo Clicked");
-				selectPhoto();
-			}
-        });
-        ll.addView(selectPhoto);
-        
-/*        final Button selectFolder = new Button(this);
-        selectFolder.setBackgroundResource(R.drawable.blue_button);
-        selectFolder.setText("select Folder");
-        selectFolder.setOnClickListener(new Button.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Log.d(TAG,"select Folder Clicked");
-				selectMultiPhotos();
-			}	
-        });
-        ll.addView(selectFolder);
-*/        
-        alert.setView(ll); 
-        alert.show(); 
-    
-    }
-    
-    private void takePhoto(){
-    	// create Intent to take a picture and return control to the calling application
-	    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-	    			    
-	    File imagesFolder = new File(FileManagement.ROOTFOLDER + "/" + getString(R.string.app_name) + "/" + memFolder + "/");
-	    
-	    File image = new File(imagesFolder, getString(R.string.default_photo_name));
-	    Uri uriSavedImage = Uri.fromFile(image);
-	    
-	    intent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage); // set the image file name
-
-	    // start the image capture Intent
-	    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-    }
-    
-    private void selectPhoto(){
-    	Intent choosePictureIntent = new Intent(Intent.ACTION_PICK, Images.Media.INTERNAL_CONTENT_URI);
-    	startActivityForResult(choosePictureIntent, REQUEST_CHOOSE_IMAGE);
-    }
-    
-    private void selectMultiPhotos(){
-    	//TODO Complete Select Folder - Need to create custom Gallery
-    //	Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE, Images.Media.INTERNAL_CONTENT_URI);
-    //	startActivityForResult(shareIntent, REQUEST_CHOOSE_MULTI_IMAGE);
-    	Toast.makeText(this, "This is not implemented yet.", Toast.LENGTH_SHORT).show();
-    	restartActivity("This is not implemented yet.");
-    }
+//    private void PhotoSelectorInflator(){
+//    	AlertDialog.Builder alert = new AlertDialog.Builder(this);  
+//
+//        LinearLayout ll = new LinearLayout(this);
+//        ll.setOrientation(LinearLayout.VERTICAL);
+//        final Button takePhoto = new Button(this);
+//        takePhoto.setBackgroundResource(R.drawable.blue_button);
+//        takePhoto.setText("Take Photo");
+//        takePhoto.setOnClickListener(new Button.OnClickListener() {
+//			@Override
+//			public void onClick(View arg0) {
+//				Log.d(TAG,"Take Photo Clicked");
+//				takePhoto();
+//			}
+//        });
+//        ll.addView(takePhoto);
+//        
+//        final Button selectPhoto = new Button(this);
+//        selectPhoto.setBackgroundResource(R.drawable.blue_button);
+//        selectPhoto.setText("select Photo");
+//        
+//        selectPhoto.setOnClickListener(new Button.OnClickListener() {
+//			@Override
+//			public void onClick(View arg0) {
+//				Log.d(TAG,"select Photo Clicked");
+//				selectPhoto();
+//			}
+//        });
+//        ll.addView(selectPhoto);
+//        
+///*        final Button selectFolder = new Button(this);
+//        selectFolder.setBackgroundResource(R.drawable.blue_button);
+//        selectFolder.setText("select Folder");
+//        selectFolder.setOnClickListener(new Button.OnClickListener() {
+//			@Override
+//			public void onClick(View arg0) {
+//				Log.d(TAG,"select Folder Clicked");
+//				selectMultiPhotos();
+//			}	
+//        });
+//        ll.addView(selectFolder);
+//*/        
+//        alert.setView(ll); 
+//        alert.show(); 
+//    
+//    }
+//    
+//    private void takePhoto(){
+//    	// create Intent to take a picture and return control to the calling application
+//	    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+//	    			    
+//	    File imagesFolder = new File(Mem.ROOT_FOLDER + "/" + getString(R.string.app_name) + "/" + memFolder + "/");
+//	    
+//	    File image = new File(imagesFolder, getString(R.string.default_photo_name));
+//	    Uri uriSavedImage = Uri.fromFile(image);
+//	    
+//	    intent.putExtra(MediaStore.EXTRA_OUTPUT, uriSavedImage); // set the image file name
+//
+//	    // start the image capture Intent
+//	    startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+//    }
+//    
+//    private void selectPhoto(){
+//    	Intent choosePictureIntent = new Intent(Intent.ACTION_PICK, Images.Media.INTERNAL_CONTENT_URI);
+//    	startActivityForResult(choosePictureIntent, REQUEST_CHOOSE_IMAGE);
+//    }
+//    
+//    private void selectMultiPhotos(){
+//    	//TODO Complete Select Folder - Need to create custom Gallery
+//    //	Intent shareIntent = new Intent(Intent.ACTION_SEND_MULTIPLE, Images.Media.INTERNAL_CONTENT_URI);
+//    //	startActivityForResult(shareIntent, REQUEST_CHOOSE_MULTI_IMAGE);
+//    	Toast.makeText(this, "This is not implemented yet.", Toast.LENGTH_SHORT).show();
+//    	restartActivity("This is not implemented yet.");
+//    }
     
     private void restartActivity(String toastStr){
     	Bundle extras = new Bundle();
@@ -256,12 +255,12 @@ public class StartMemoryActivity extends Activity {
     
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == Mem.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
             	cAlerts.namePhotoAfterImport(this, fManagement);
             }
         }
-        else if (requestCode == REQUEST_CHOOSE_IMAGE) {
+        else if (requestCode == Mem.REQUEST_CHOOSE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Log.d(TAG, "Picture Choosen: " + getPath(data.getData()));
                 fManagement.copyPhoto(getPath(data.getData()));
@@ -326,8 +325,7 @@ public class StartMemoryActivity extends Activity {
     		startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(str)));
     		return true;
     	case R.id.menu_about: //TODO Settings page
-    		//TODO Create About Me Page
-    		Toast.makeText(this, "About Inflate", Toast.LENGTH_SHORT).show();  
+    		cAlerts.aboutAlert(StartMemoryActivity.this);  
     		return true;
     	default:
     		return super.onOptionsItemSelected(item);

@@ -3,6 +3,8 @@ package com.nennig.photomem;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.os.Environment;
+
 public class Mem {
 	//Variables for Bundles
 	public static final String CURRENT_MEM = "com.nennig.photomem.CURRENT_MEM";
@@ -17,6 +19,12 @@ public class Mem {
 	public static final String TIMES_COMPLETED = "TimesMemCompleted";
 	public static final String COMPLETION_RATE = "CompletionRate";
 	public static final String PERFECT_MEM = "PerfectMem";
+	
+	//General Shared static variables
+	public static final String DEFAULT_CREATE_MEM = "+ Create New Mem";
+	public static final String ROOT_FOLDER = Environment.getExternalStorageDirectory().toString();
+	public static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 1;
+	public static final int REQUEST_CHOOSE_IMAGE_REQUEST_CODE = 2;
 	
 	//Variables native to this class
 	private String _name;

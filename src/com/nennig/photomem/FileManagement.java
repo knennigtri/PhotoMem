@@ -31,14 +31,13 @@ public class FileManagement {
 	private static final String TAG = "FileManagement";
 	private static String[] acceptedExtensions = {".jpg",".png"};
 	private Activity _activity;
-	public static String ROOTFOLDER = Environment.getExternalStorageDirectory().toString();
-	public String memFolder;
-	public String memFolderPath;
+	private String memFolder;
+	private String memFolderPath;
 	
 	public FileManagement(Activity a, String folder){
 		memFolder = folder;
 		_activity = a;
-		memFolderPath = ROOTFOLDER + "/" + _activity.getString(R.string.app_name) + 
+		memFolderPath = Mem.ROOT_FOLDER + "/" + _activity.getString(R.string.app_name) + 
     			"/" + memFolder;
 		Log.d(TAG, "Constructor: " + memFolderPath);
 	}

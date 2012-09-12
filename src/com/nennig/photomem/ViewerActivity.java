@@ -28,7 +28,6 @@ public class ViewerActivity extends Activity {
 	private String[] photoPaths;
 	private int memorizedCount = 0;
 	private int wrongCount = 0;
-    private CustomAlerts cAlerts;
     private FileManagement fManagement;
     private Bitmap bitmapImage;
     private  boolean _randomize;
@@ -38,12 +37,11 @@ public class ViewerActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);        
         setContentView(R.layout.activity_viewer);
-        
+
         if(savedInstanceState !=null)
         {
         	_current_mem = savedInstanceState.getString(Mem.CURRENT_MEM);
         	_randomize = savedInstanceState.getBoolean(Mem.RANDOMIZE);
-        	cAlerts = new CustomAlerts(this, _current_mem);
             fManagement = new FileManagement(this, _current_mem);
             photoIndex = savedInstanceState.getInt("photoIndex");
             photoPaths = savedInstanceState.getStringArray("photoPaths");
@@ -52,7 +50,6 @@ public class ViewerActivity extends Activity {
         {
         	_current_mem =getIntent().getStringExtra(Mem.CURRENT_MEM);
         	_randomize = getIntent().getExtras().getBoolean(Mem.RANDOMIZE);
-        	cAlerts = new CustomAlerts(this, getIntent().getExtras().getString(Mem.CURRENT_MEM));
 	        fManagement = new FileManagement(this, getIntent().getExtras().getString(Mem.CURRENT_MEM));
 	        
 	        if(_randomize) 
