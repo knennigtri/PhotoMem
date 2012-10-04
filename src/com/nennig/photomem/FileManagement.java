@@ -43,6 +43,8 @@ public class FileManagement {
 	}
 
     public void renamePhoto(String newName, String prevName){
+    	Log.d(TAG, "Current image path: " + memFolderPath + "/" + prevName);
+    	Log.d(TAG, "New image path: " + memFolderPath + "/" + newName);
     	File file = new File(memFolderPath + "/" + prevName);
     	if(file.exists())
     	{

@@ -113,7 +113,7 @@ public class MainActivity extends ListActivity {
     	switch(item.getItemId()){
     	case R.id.add_mem:
     		cAlerts.createMemAlert(MainActivity.this);
-    		//if (p != null) showPopup(MainActivity.this, p);          	
+    		return true;
     	case R.id.menu_about: //TODO Settings page
     		cAlerts.aboutAlert(MainActivity.this);
     		return true;

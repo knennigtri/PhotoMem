@@ -90,7 +90,6 @@ public class StartMemoryActivity extends Activity {
 	            	Intent intent = new Intent(StartMemoryActivity.this,ViewerActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
-	            	finish();
         		}
         		else
         		{
@@ -110,7 +109,6 @@ public class StartMemoryActivity extends Activity {
 	            	Intent intent = new Intent(StartMemoryActivity.this,PracticeActivity.class);
 	            	intent.putExtras(extras);          
 	            	startActivity(intent);
-	            	finish();
         		}
         		else
         		{
@@ -257,13 +255,15 @@ public class StartMemoryActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == Mem.CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-            	cAlerts.namePhotoAfterImport(this, fManagement);
+            	cAlerts.namePhotoAfterImport(this, fManagement,getString(R.string.default_photo_name));
             }
         }
         else if (requestCode == Mem.REQUEST_CHOOSE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 Log.d(TAG, "Picture Choosen: " + getPath(data.getData()));
                 fManagement.copyPhoto(getPath(data.getData()));
+                String[] path = getPath(data.getData()).split("/");
+                cAlerts.namePhotoAfterImport(this, fManagement, path[path.length-1]);
             }
         }
 /*        else if (requestCode == REQUEST_CHOOSE_MULTI_IMAGE) {
@@ -279,7 +279,7 @@ public class StartMemoryActivity extends Activity {
             }
         }
 */
-        restartActivity("Photo added to Mem");
+   //     restartActivity("Photo added to Mem");
     }
     
     public String getPath(Uri uri) {

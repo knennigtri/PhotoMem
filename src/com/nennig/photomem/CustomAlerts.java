@@ -111,22 +111,32 @@ public class CustomAlerts{
 	 ******Custom Alerts for StartMemoryActivity START*********
 	 **********************************************************/
 	
-	public void namePhotoAfterImport(final Context c, final FileManagement f){
+	public void namePhotoAfterImport(final Context c, final FileManagement f, final String oldName){
 		AlertDialog.Builder alert = new AlertDialog.Builder(c); 
 
+		
+			
+		
         alert.setTitle("New Photo"); 
         alert.setMessage("What should be remembered?"); 
         
         final EditText name = new EditText(c);
-        name.setHint("Photo Description");
+        
+        if(!oldName.equals(_activity.getString(R.string.default_photo_name)))
+        	name.setText(oldName);
+        else
+        	name.setHint("Memory Description with Photo");
         
         alert.setView(name); 
 
         alert.setPositiveButton("Add Photo", new DialogInterface.OnClickListener() { 
             public void onClick(DialogInterface dialog, int whichButton) { 
-            	f.renamePhoto(name.getText().toString(), _activity.getString(R.string.default_photo_name));
+            	f.renamePhoto(name.getText().toString(), oldName);
             	Log.d(TAG, name.getText().toString());
-            	Toast.makeText(c, "Photo Added to Mem!", Toast.LENGTH_LONG).show();
+            	Intent intent = new Intent(_activity, StartMemoryActivity.class);
+            	intent.putExtra(Mem.CURRENT_MEM, _activity.getIntent().getExtras().getString(Mem.CURRENT_MEM));
+            	_activity.startActivity(intent);
+            	_activity.finish();
             } 
         }); 
         alert.show(); 
@@ -264,19 +274,6 @@ public class CustomAlerts{
     	if(!folder.exists())
     	{
     		folder.mkdirs();
-    		File descFile = new File(folder,_activity.getString(R.string.infoFile));
-    		try
-    		{
-    			FileWriter fstream = new FileWriter(descFile);
-    			BufferedWriter out = new BufferedWriter(fstream);
-    			out.write(desc);
-    			out.close();
-    		}
-    		catch(IOException e)
-    		{
-    			Log.e(TAG, e.getMessage());
-    		}
-    		Log.d(TAG, "New Mem Created: " + name);
     	}
     	else
     	{
